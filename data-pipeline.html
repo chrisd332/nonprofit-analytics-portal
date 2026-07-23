@@ -5,11 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nonprofit Executive Analytics Portal - Data Warehouse Hub</title>
   
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* Navigation */
+    /* Typography Upgrades */
+    h1, h2, h3, h4, .navbar h1, .page-title {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* Top Navigation */
     .navbar {
       background-color: #0f172a;
       color: #ffffff;
@@ -19,68 +30,71 @@
       align-items: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    .navbar h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: 0.5px; }
+    .navbar h1 { 
+      font-size: 1.3rem; 
+      font-weight: 800; 
+      letter-spacing: 0.5px; 
+      background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .nav-links { display: flex; gap: 1.5rem; list-style: none; }
     .nav-links a { color: #94a3b8; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s ease; }
     .nav-links a.active, .nav-links a:hover { color: #38bdf8; }
 
-    /* Layout */
-    .main-container { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1; }
-    .page-header { margin-bottom: 1.5rem; }
-    .page-title { font-size: 1.75rem; font-weight: 700; color: #0f172a; }
-    .page-subtitle { font-size: 0.95rem; color: #64748b; margin-top: 0.25rem; }
+    /* Layout Container */
+    .main-container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1; }
+    .page-header { margin-bottom: 2rem; }
+    .page-title { font-size: 1.8rem; font-weight: 700; color: #0f172a; }
+    .page-subtitle { font-size: 1rem; color: #64748b; margin-top: 0.25rem; }
 
-    /* Stakeholder Banner */
-    .stakeholder-banner {
-      background-color: #f0f9ff;
+    /* Summary Banner */
+    .summary-box {
+      background: #e0f2fe;
       border-left: 4px solid #0284c7;
-      padding: 1.25rem;
+      padding: 1.25rem 1.5rem;
       border-radius: 8px;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 4px 10px -2px rgba(2, 132, 199, 0.12);
+      margin-bottom: 1.75rem;
+      box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
     }
-    .stakeholder-banner h4 { color: #0369a1; font-size: 1rem; margin-bottom: 0.35rem; }
-    .stakeholder-banner p { color: #334155; font-size: 0.9rem; line-height: 1.6; margin: 0; }
+    .summary-box h3 { color: #0369a1; font-size: 1.1rem; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+    .summary-box p { font-size: 0.92rem; color: #0c4a6e; line-height: 1.6; }
 
-    /* Cards with Shadow */
+    /* Elevated Cards */
     .card { 
       background: #ffffff; 
-      padding: 1.75rem; 
+      padding: 2rem; 
       border-radius: 10px; 
       border: 1px solid #cbd5e1; 
       box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.09), 0 4px 6px -2px rgba(15, 23, 42, 0.04); 
-      margin-bottom: 1.5rem;
-      transition: box-shadow 0.2s ease;
+      margin-bottom: 1.75rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .card:hover {
+      transform: translateY(-2px);
       box-shadow: 0 14px 25px -5px rgba(15, 23, 42, 0.12), 0 6px 10px -2px rgba(15, 23, 42, 0.06);
     }
-    .card h3 { font-size: 1.2rem; color: #0f172a; margin-bottom: 0.5rem; font-weight: 600; border-bottom: 2px solid #38bdf8; padding-bottom: 0.4rem; display: inline-block; }
-    .card p.section-desc { font-size: 0.9rem; color: #475569; line-height: 1.6; margin-bottom: 1.25rem; }
+    .card h3 { font-size: 1.25rem; color: #0f172a; margin-bottom: 0.85rem; border-bottom: 2px solid #38bdf8; padding-bottom: 0.4rem; display: inline-block; }
+    .card p { font-size: 0.95rem; line-height: 1.7; color: #334155; margin-bottom: 1.1rem; }
 
-    /* Pipeline Step Grid */
-    .pipeline-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
-    .pipeline-step {
+    /* Grid layout for Schema Layers */
+    .schema-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
+    .schema-box {
       background: #f8fafc;
       padding: 1.25rem;
       border-radius: 8px;
       border: 1px solid #cbd5e1;
     }
-    .pipeline-step h4 { color: #0284c7; font-size: 0.95rem; margin-bottom: 0.5rem; font-weight: 700; }
-    .pipeline-step p { font-size: 0.88rem; color: #334155; line-height: 1.5; margin: 0; }
+    .schema-box h4 { color: #0284c7; font-size: 1rem; margin-bottom: 0.5rem; font-weight: 700; }
+    .schema-box ul { list-style: none; margin-top: 0.5rem; }
+    .schema-box li { font-size: 0.88rem; color: #334155; padding: 0.25rem 0; font-family: monospace; }
 
-    .status { padding: 0.25rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
-    .status.success { background: #dcfce7; color: #166534; }
-
-    .table-container { overflow-x: auto; margin-top: 0.5rem; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-    th { background-color: #f1f5f9; color: #475569; font-weight: 600; padding: 0.75rem 1rem; border-bottom: 1px solid #cbd5e1; }
-    td { padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; color: #334155; }
     code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem; color: #0f172a; }
   </style>
 </head>
 <body>
 
+  <!-- Navigation Bar -->
   <header class="navbar">
     <h1>Nonprofit Executive Analytics Portal</h1>
     <nav>
@@ -99,122 +113,59 @@
       <p class="page-subtitle">Technical transparency into database transformations, batch execution logs, and data dictionary catalogs for <code>nonprofit_dw</code>.</p>
     </div>
 
-    <div class="stakeholder-banner">
-      <h4>💡 Database Layer Alignment</h4>
-      <p>This page documents the technical schema layer powering <code>nonprofit_dw</code>. Raw data enters through the <code>staging</code> schema before being transformed into normalized fact and dimension structures for executive reporting.</p>
+    <!-- Database Banner -->
+    <div class="summary-box">
+      <h3>💡 Database Layer Alignment</h3>
+      <p>
+        This page documents the technical schema layer powering <code>nonprofit_dw</code>. Raw data enters through the <code>staging</code> schema before being transformed into normalized fact and dimension structures for executive reporting.
+      </p>
     </div>
 
-    <!-- Architectural Overview -->
+    <!-- Star Schema Card -->
     <div class="card">
       <h3>Expanded Star Schema Architecture (<code>nonprofit_dw</code>)</h3>
-      <p class="section-desc">
+      <p>
         To support multi-dimensional reporting across fundraising, volunteer efforts, and program impact, our ELT pipeline aggregates raw operational sources from <code>staging</code> into unified warehouse tables:
       </p>
-      
-      <div class="pipeline-grid">
-        <div class="pipeline-step">
+
+      <div class="schema-grid">
+        <div class="schema-box">
           <h4>Staging Ingestion</h4>
-          <p><code>staging.stg_raw_donors_giving</code><br><code>staging.stg_raw_resource_distribution</code></p>
+          <ul>
+            <li><code>staging.stg_raw_donors_giving</code></li>
+            <li><code>staging.stg_raw_resource_distribution</code></li>
+          </ul>
         </div>
-        <div class="pipeline-step">
+
+        <div class="schema-box">
           <h4>Warehouse Fact Tables</h4>
-          <p><code>fact_donations</code><br><code>fact_resource_distribution</code><br><code>fact_volunteer_activity</code></p>
+          <ul>
+            <li><code>fact_donations</code></li>
+            <li><code>fact_resource_distribution</code></li>
+            <li><code>fact_volunteer_activity</code></li>
+          </ul>
         </div>
-        <div class="pipeline-step">
+
+        <div class="schema-box">
           <h4>Warehouse Dimension Tables</h4>
-          <p><code>dim_donors</code><br><code>dim_resources</code><br><code>dim_hubs</code><br><code>dim_campaigns</code></p>
+          <ul>
+            <li><code>dim_donors</code></li>
+            <li><code>dim_hubs</code></li>
+            <li><code>dim_campaigns</code></li>
+            <li><code>dim_resources</code></li>
+          </ul>
         </div>
       </div>
     </div>
 
-    <!-- Volunteer Fact Table Definition -->
+    <!-- Technical Pipeline Workflow -->
     <div class="card">
-      <h3>Volunteer Human Capital Fact Table (<code>fact_volunteer_activity</code>)</h3>
-      <p class="section-desc">
-        Logs shift entries, volunteer hours, and localized labor contributions in <code>nonprofit_dw</code>. The estimated economic labor value is computed automatically using Independent Sector baseline rates ($31.80/hour).
+      <h3>Automated API Data Pipeline Workflow</h3>
+      <p>
+        1. <strong>Extraction:</strong> Raw CSV uploads and API webhooks land directly into the PostgreSQL <code>staging</code> schema.<br>
+        2. <strong>Transformation:</strong> Automated scripts clean null values, normalize date formats, and compute key metrics (like CPDR and labor values).<br>
+        3. <strong>Serving Layer:</strong> The lightweight PHP PDO API (<code>api/get_dashboard_data.php</code>) fetches query results and serves formatted JSON payloads directly to Chart.js and frontend tables.
       </p>
-      
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Log ID</th>
-              <th>Volunteer ID</th>
-              <th>Assigned Hub</th>
-              <th>Activity Category</th>
-              <th>Hours Contributed</th>
-              <th>Est. Economic Value ($)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>VOL-9011</code></td>
-              <td><code>USR-4402</code></td>
-              <td>East Region Hub</td>
-              <td>Supply Kitting & Packing</td>
-              <td>12.5 hrs</td>
-              <td>$397.50</td>
-            </tr>
-            <tr>
-              <td><code>VOL-9012</code></td>
-              <td><code>USR-1189</code></td>
-              <td>Maryland Central Hub</td>
-              <td>Food Rations Freight Loading</td>
-              <td>8.0 hrs</td>
-              <td>$254.40</td>
-            </tr>
-            <tr>
-              <td><code>VOL-9013</code></td>
-              <td><code>USR-8820</code></td>
-              <td>Bowie Distribution Center</td>
-              <td>Community Aid Registration</td>
-              <td>15.0 hrs</td>
-              <td>$477.00</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Campaign Catalog -->
-    <div class="card">
-      <h3>Outreach Campaigns Dimension Catalog (<code>dim_campaigns</code>)</h3>
-      <p class="section-desc">
-        Standardized mapping table used to evaluate marketing acquisition channels, campaign budgets, and fundraising efficiency metrics.
-      </p>
-
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Campaign Code</th>
-              <th>Campaign Name</th>
-              <th>Channel</th>
-              <th>Budget Allocated ($)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>CMP-2026-Q1</code></td>
-              <td>Spring Relief Appeal</td>
-              <td>Direct Mail & Email</td>
-              <td>$3,500.00</td>
-            </tr>
-            <tr>
-              <td><code>CMP-2026-Q2</code></td>
-              <td>Annual Partner Gala</td>
-              <td>Event / Sponsorship</td>
-              <td>$12,000.00</td>
-            </tr>
-            <tr>
-              <td><code>CMP-2026-DIG</code></td>
-              <td>Always-On Digital Acquisition</td>
-              <td>Social Media Ads</td>
-              <td>$1,500.00</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
   </main>

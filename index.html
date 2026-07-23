@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nonprofit Executive Analytics Portal - Dashboard</title>
   
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
   <!-- Chart.js & Plugins -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
@@ -12,6 +17,12 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Typography Upgrades */
+    h1, h2, h3, .navbar h1, .page-title, .kpi-value {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: -0.02em;
+    }
 
     /* Top Navigation */
     .navbar {
@@ -23,7 +34,14 @@
       align-items: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    .navbar h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: 0.5px; }
+    .navbar h1 { 
+      font-size: 1.3rem; 
+      font-weight: 800; 
+      letter-spacing: 0.5px; 
+      background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .nav-links { display: flex; gap: 1.5rem; list-style: none; }
     .nav-links a { color: #94a3b8; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s ease; }
     .nav-links a.active, .nav-links a:hover { color: #38bdf8; }
@@ -359,7 +377,7 @@
       <div class="chart-card">
         <h3>Donation Performance by Payment Method</h3>
         <p class="chart-desc">
-          This chart illustrates total monetary contributions categorized by individual donor profiles and payment platforms. Stakeholders can use this breakdown to evaluate payment gateway volume and identify liquidity trends across different donor types.
+          This chart illustrates total monetary contributions aggregated across specific payment methods (e.g., Wire Transfer, Check, Stripe, PayPal). Stakeholders can use this category breakdown to evaluate payment gateway volume and identify liquidity trends across different donor types.
         </p>
         <div style="flex: 1; min-height: 280px;">
           <canvas id="donationChart"></canvas>
@@ -493,12 +511,32 @@
     let masterVolunteers = [];
     let masterCampaigns = [];
 
-    // Chart Instances
+    // Chart 1 Instance (Aggregated by Payment Method)
     const ctx1 = document.getElementById('donationChart').getContext('2d');
     const donationChart = new Chart(ctx1, {
       type: 'bar',
-      data: { labels: [], datasets: [{ label: 'Sum ($)', data: [], backgroundColor: ['#700080', '#0080ff', '#ff6600', '#0000aa', '#0284c7', '#10b981', '#38bdf8'], barPercentage: 0.45 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'center', color: '#fff', font: { weight: 'bold', size: 10 }, formatter: (v) => (v >= 1000 ? (v / 1000).toFixed(1) + 'K' : '$' + v) } } }
+      data: { 
+        labels: [], 
+        datasets: [{ 
+          label: 'Total Raised ($)', 
+          data: [], 
+          backgroundColor: ['#700080', '#0080ff', '#ff6600', '#0000aa', '#10b981'], 
+          barPercentage: 0.45 
+        }] 
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false, 
+        plugins: { 
+          legend: { display: false }, 
+          datalabels: { 
+            anchor: 'center', 
+            color: '#fff', 
+            font: { weight: 'bold', size: 11 }, 
+            formatter: (v) => (v >= 1000 ? '$' + (v / 1000).toFixed(1) + 'K' : '$' + v) 
+          } 
+        } 
+      }
     });
 
     const ctx2 = document.getElementById('resourceChart').getContext('2d');
@@ -597,8 +635,16 @@
       document.getElementById('kpi-volunteer-hrs').innerText = `${totalVolHrs.toFixed(1)} hrs`;
       document.getElementById('kpi-volunteer-val').innerText = `~$${(volEconVal / 1000).toFixed(1)}K labor value`;
 
-      donationChart.data.labels = filteredDonations.map(d => d.id);
-      donationChart.data.datasets[0].data = filteredDonations.map(d => d.amount);
+      // Aggregate donations by Payment Method instead of individual donor IDs
+      const paymentTotals = filteredDonations.reduce((acc, curr) => {
+        const method = curr.method || 'Other';
+        acc[method] = (acc[method] || 0) + curr.amount;
+        return acc;
+      }, {});
+
+      // Update Chart 1 labels and dataset
+      donationChart.data.labels = Object.keys(paymentTotals);
+      donationChart.data.datasets[0].data = Object.values(paymentTotals);
       donationChart.update();
 
       resourceChart.data.labels = filteredResources.map(r => r.hub.replace(' Hub', '').replace(' Center', ''));

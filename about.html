@@ -5,11 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nonprofit Executive Analytics Portal - About & User Guide</title>
   
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* Navigation */
+    /* Typography Upgrades */
+    h1, h2, h3, h4, .navbar h1, .page-title {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* Top Navigation */
     .navbar {
       background-color: #0f172a;
       color: #ffffff;
@@ -19,7 +30,14 @@
       align-items: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    .navbar h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: 0.5px; }
+    .navbar h1 { 
+      font-size: 1.3rem; 
+      font-weight: 800; 
+      letter-spacing: 0.5px; 
+      background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .nav-links { display: flex; gap: 1.5rem; list-style: none; }
     .nav-links a { color: #94a3b8; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s ease; }
     .nav-links a.active, .nav-links a:hover { color: #38bdf8; }
@@ -91,10 +109,10 @@
     <div class="card">
       <h3>What Is This System?</h3>
       <p>
-        The <strong>Nonprofit Executive Analytics Portal</strong> is an enterprise reporting platform designed to consolidate fragmented operational datasets into a single, cohesive dashboard. Modern nonprofit organizations manage complex operational ecosystems, ranging from digital donor management systems (CRM) and payment processing gateways to regional warehouse distribution networks and volunteer scheduling platforms.
+        The <strong>Nonprofit Executive Analytics Portal</strong> is an enterprise reporting platform designed to consolidate fragmented operational datasets into a single, cohesive dashboard. Modern nonprofit organizations manage complex operational ecosystems—ranging from digital donor management systems (CRM) and payment processing gateways to regional warehouse distribution networks and volunteer scheduling platforms.
       </p>
       <p>
-        Operating behind the web portal is a normalized relational database warehouse (`nonprofit_dw`) organized into a star schema structure. The system automatically ingests uncleaned transaction logs into an isolated `staging` schema before executing automated transformations. These cleaned records hydrate interactive Chart.js visualizations, financial transaction tables, volunteer human capital logs, and high-level KPI cards in real time via an asynchronous JavaScript API pipeline (`api/get_dashboard_data.php`).
+        Operating behind the web portal is a normalized relational database warehouse (<code>nonprofit_dw</code>) organized into a star schema structure. The system automatically ingests uncleaned transaction logs into an isolated <code>staging</code> schema before executing automated transformations. These cleaned records hydrate interactive Chart.js visualizations, financial transaction tables, volunteer human capital logs, and high-level KPI cards in real time via an asynchronous JavaScript API pipeline (<code>api/get_dashboard_data.php</code>).
       </p>
     </div>
 
@@ -123,21 +141,21 @@
 
       <div class="persona-grid">
         <div class="persona-box">
-          <h4>Executive Leadership & Board Members</h4>
+          <h4>👔 Executive Leadership & Board Members</h4>
           <p>
             Requires rapid, high-level strategic summaries. They utilize the 6 KPI cards and Executive Insights tab to evaluate fiscal health, verify grant compliance, and monitor overhead metrics like Cost Per Dollar Raised.
           </p>
         </div>
 
         <div class="persona-box">
-          <h4>Operations & Logistics Managers</h4>
+          <h4>📦 Operations & Logistics Managers</h4>
           <p>
             Focuses on regional resource distribution and supply throughput. They leverage the 3×1 vertical charts and distribution hub filters to spot inventory bottlenecks and rebalance shipments across regional facilities.
           </p>
         </div>
 
         <div class="persona-box">
-          <h4>Development & Marketing Teams</h4>
+          <h4>📣 Development & Marketing Teams</h4>
           <p>
             Evaluates donor retention and campaign ROI. They utilize the Campaign Revenue vs. Marketing Budget visualizations and CSV data export controls to refine acquisition strategies and target high-yield donor segments.
           </p>
@@ -162,7 +180,7 @@
         <tbody>
           <tr>
             <td><code>staging.stg_raw_*</code></td>
-            <td>Staging schema tables in `nonprofit_dw` that temporarily store raw, uncleaned input data prior to transformation.</td>
+            <td>Staging schema tables in <code>nonprofit_dw</code> that temporarily store raw, uncleaned input data prior to transformation.</td>
           </tr>
           <tr>
             <td><code>donor_id</code></td>
