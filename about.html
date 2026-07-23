@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nonprofit Executive Analytics Portal - About & User Guide</title>
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Navigation */
+    .navbar {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .navbar h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: 0.5px; }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a { color: #94a3b8; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s ease; }
+    .nav-links a.active, .nav-links a:hover { color: #38bdf8; }
+
+    /* Layout Container */
+    .main-container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1; }
+    .page-header { margin-bottom: 2rem; }
+    .page-title { font-size: 1.8rem; font-weight: 700; color: #0f172a; }
+    .page-subtitle { font-size: 1rem; color: #64748b; margin-top: 0.25rem; }
+
+    /* Elevated Cards */
+    .card { 
+      background: #ffffff; 
+      padding: 2rem; 
+      border-radius: 10px; 
+      border: 1px solid #cbd5e1; 
+      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.09), 0 4px 6px -2px rgba(15, 23, 42, 0.04); 
+      margin-bottom: 1.75rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 25px -5px rgba(15, 23, 42, 0.12), 0 6px 10px -2px rgba(15, 23, 42, 0.06);
+    }
+    .card h3 { font-size: 1.25rem; color: #0f172a; margin-bottom: 0.85rem; border-bottom: 2px solid #38bdf8; padding-bottom: 0.4rem; display: inline-block; }
+    .card p { font-size: 0.95rem; line-height: 1.7; color: #334155; margin-bottom: 1.1rem; }
+    .card p:last-child { margin-bottom: 0; }
+
+    /* Persona Grid */
+    .persona-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
+    .persona-box {
+      background: #f8fafc;
+      padding: 1.25rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .persona-box h4 { color: #0284c7; font-size: 1rem; margin-bottom: 0.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem; }
+    .persona-box p { font-size: 0.88rem; color: #334155; line-height: 1.5; margin: 0; }
+
+    /* Table Styling */
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
+    th { background-color: #f1f5f9; color: #475569; font-weight: 600; padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #cbd5e1; }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; color: #334155; line-height: 1.5; }
+    code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem; color: #0f172a; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <h1>Nonprofit Executive Analytics Portal</h1>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="insights.html">Executive Insights</a></li>
+        <li><a href="data-pipeline.html">Data Warehouse Hub</a></li>
+        <li><a href="about.html" class="active">About & Guide</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="main-container">
+    <div class="page-header">
+      <h2 class="page-title">System Overview & User Guide</h2>
+      <p class="page-subtitle">A comprehensive guide detailing the purpose, strategic importance, and target audience for the portal.</p>
+    </div>
+
+    <!-- Section 1: System Purpose -->
+    <div class="card">
+      <h3>What Is This System?</h3>
+      <p>
+        The <strong>Nonprofit Executive Analytics Portal</strong> is an enterprise reporting platform designed to consolidate fragmented operational datasets into a single, cohesive dashboard. Modern nonprofit organizations manage complex operational ecosystems, ranging from digital donor management systems (CRM) and payment processing gateways to regional warehouse distribution networks and volunteer scheduling platforms.
+      </p>
+      <p>
+        Operating behind the web portal is a normalized relational database warehouse (`nonprofit_dw`) organized into a star schema structure. The system automatically ingests uncleaned transaction logs into an isolated `staging` schema before executing automated transformations. These cleaned records hydrate interactive Chart.js visualizations, financial transaction tables, volunteer human capital logs, and high-level KPI cards in real time via an asynchronous JavaScript API pipeline (`api/get_dashboard_data.php`).
+      </p>
+    </div>
+
+    <!-- Section 2: Strategic Importance -->
+    <div class="card">
+      <h3>Why Is This Analytics Portal Important?</h3>
+      <p>
+        In the mission-driven sector, organizational survival and impact growth depend on transparency, operational efficiency, and rapid decision-making. Nonprofits frequently operate under strict institutional oversight where major grantors, board members, and public donors expect rigorous accountability for every dollar received and spent.
+      </p>
+      <p>
+        By bridging the gap between raw backend databases and executive presentation layers, this portal solves several critical operational challenges:
+      </p>
+      <p>
+        • <strong>Eliminates Data Silos:</strong> Financial contributions and physical aid distributions are evaluated side-by-side, giving leadership a holistic view of institutional health.<br>
+        • <strong>Quantifies Non-Monetary Impact:</strong> Incorporates Independent Sector national baseline valuations ($31.80/hour) to translate raw volunteer shift hours into quantifiable labor capital for grant matching.<br>
+        • <strong>Optimizes Fundraising Efficiency:</strong> Tracks Cost Per Dollar Raised (CPDR) and campaign acquisition ROI across marketing channels to ensure organizational overhead remains lean and accountable.
+      </p>
+    </div>
+
+    <!-- Section 3: Target Audience / Stakeholder Personas -->
+    <div class="card">
+      <h3>Who Is This System Built For?</h3>
+      <p>
+        The portal is specifically tailored to meet the distinct operational requirements of key non-technical leadership personas across the organization:
+      </p>
+
+      <div class="persona-grid">
+        <div class="persona-box">
+          <h4>Executive Leadership & Board Members</h4>
+          <p>
+            Requires rapid, high-level strategic summaries. They utilize the 6 KPI cards and Executive Insights tab to evaluate fiscal health, verify grant compliance, and monitor overhead metrics like Cost Per Dollar Raised.
+          </p>
+        </div>
+
+        <div class="persona-box">
+          <h4>Operations & Logistics Managers</h4>
+          <p>
+            Focuses on regional resource distribution and supply throughput. They leverage the 3×1 vertical charts and distribution hub filters to spot inventory bottlenecks and rebalance shipments across regional facilities.
+          </p>
+        </div>
+
+        <div class="persona-box">
+          <h4>Development & Marketing Teams</h4>
+          <p>
+            Evaluates donor retention and campaign ROI. They utilize the Campaign Revenue vs. Marketing Budget visualizations and CSV data export controls to refine acquisition strategies and target high-yield donor segments.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Plain-English Data Glossary -->
+    <div class="card">
+      <h3>Plain-English Data Glossary</h3>
+      <p>
+        To ensure technical clarity across departments, key database terms and calculated metrics are defined below:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Term / Field</th>
+            <th>What It Means in Plain English</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>staging.stg_raw_*</code></td>
+            <td>Staging schema tables in `nonprofit_dw` that temporarily store raw, uncleaned input data prior to transformation.</td>
+          </tr>
+          <tr>
+            <td><code>donor_id</code></td>
+            <td>A unique identifier assigned to each donor or organization to track giving history while maintaining privacy standards.</td>
+          </tr>
+          <tr>
+            <td><code>quantity_delta</code></td>
+            <td>The net change in physical warehouse inventory (positive numbers reflect incoming supplies; negative numbers reflect shipped aid).</td>
+          </tr>
+          <tr>
+            <td><code>Cost Per Dollar Raised (CPDR)</code></td>
+            <td>A fundraising efficiency ratio calculated by dividing marketing/event expenses by total funds raised ($0.12 means it costs 12 cents to raise $1.00).</td>
+          </tr>
+          <tr>
+            <td><code>Volunteer Labor Economic Value</code></td>
+            <td>Estimated financial value assigned to volunteer hours using Independent Sector national standards ($31.80/hour) for grant reporting.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+</body>
+</html>
