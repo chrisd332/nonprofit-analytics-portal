@@ -15,12 +15,12 @@
     body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
 
     /* Typography Upgrades */
-    h1, h2, h3, h4, .navbar h1, .page-title {
+    h1, h2, h3, .navbar h1, .page-title, .card-title {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       letter-spacing: -0.02em;
     }
 
-    /* Top Navigation */
+    /* Top Navigation Header */
     .navbar {
       background-color: #0f172a;
       color: #ffffff;
@@ -29,7 +29,30 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 10;
     }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    
+    /* Clean Hamburger Button */
+    .hamburger-btn {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-size: 1.6rem;
+      padding: 0.2rem 0.4rem;
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .hamburger-btn:hover {
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+
     .navbar h1 { 
       font-size: 1.3rem; 
       font-weight: 800; 
@@ -38,137 +61,456 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
-    .nav-links a { color: #94a3b8; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s ease; }
-    .nav-links a.active, .nav-links a:hover { color: #38bdf8; }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+
+    .btn-logout {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.85rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-logout:hover { background: #dc2626; }
+
+    /* Slide-out Sidebar Drawer */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -290px;
+      width: 290px;
+      height: 100vh;
+      background-color: #0f172a;
+      color: #fff;
+      z-index: 1000;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar.open { left: 0; }
+
+    .sidebar-header {
+      padding: 1.25rem 1.5rem;
+      background: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    .sidebar-header h3 { font-size: 1rem; color: #38bdf8; font-weight: 700; }
+    .close-btn { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; }
+    .close-btn:hover { color: #fff; }
+
+    .sidebar-menu { list-style: none; padding: 1rem 0; flex: 1; }
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1.5rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+    .sidebar-menu li a:hover, .sidebar-menu li a.active {
+      background: #1e293b;
+      color: #38bdf8;
+      border-left: 4px solid #38bdf8;
+    }
+    .menu-divider { height: 1px; background: #334155; margin: 0.75rem 0; }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
     /* Layout Container */
     .main-container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1; }
-    .page-header { margin-bottom: 2rem; }
-    .page-title { font-size: 1.8rem; font-weight: 700; color: #0f172a; }
-    .page-subtitle { font-size: 1rem; color: #64748b; margin-top: 0.25rem; }
 
-    /* Summary Banner */
-    .summary-box {
-      background: #e0f2fe;
-      border-left: 4px solid #0284c7;
-      padding: 1.25rem 1.5rem;
-      border-radius: 8px;
-      margin-bottom: 1.75rem;
-      box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
-    }
-    .summary-box h3 { color: #0369a1; font-size: 1.1rem; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
-    .summary-box p { font-size: 0.92rem; color: #0c4a6e; line-height: 1.6; }
+    .page-header-row { margin-bottom: 1.5rem; }
+    .page-title { font-size: 1.6rem; font-weight: 700; color: #0f172a; }
+    .page-subtitle { font-size: 0.88rem; color: #64748b; margin-top: 0.2rem; }
 
-    /* Elevated Cards */
-    .card { 
-      background: #ffffff; 
-      padding: 2rem; 
-      border-radius: 10px; 
-      border: 1px solid #cbd5e1; 
-      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.09), 0 4px 6px -2px rgba(15, 23, 42, 0.04); 
-      margin-bottom: 1.75rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* Technical Doc Cards */
+    .doc-card {
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
     }
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 25px -5px rgba(15, 23, 42, 0.12), 0 6px 10px -2px rgba(15, 23, 42, 0.06);
+    .card-title {
+      font-size: 1.2rem;
+      color: #0f172a;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    .card h3 { font-size: 1.25rem; color: #0f172a; margin-bottom: 0.85rem; border-bottom: 2px solid #38bdf8; padding-bottom: 0.4rem; display: inline-block; }
-    .card p { font-size: 0.95rem; line-height: 1.7; color: #334155; margin-bottom: 1.1rem; }
+    .doc-card p {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #334155;
+      margin-bottom: 1rem;
+    }
 
-    /* Grid layout for Schema Layers */
-    .schema-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
-    .schema-box {
+    /* Pipeline Step Diagram */
+    .pipeline-steps {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .step-box {
+      flex: 1;
+      min-width: 200px;
       background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .step-num {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #0284c7;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .step-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.35rem;
+    }
+    .step-desc {
+      font-size: 0.82rem;
+      color: #64748b;
+    }
+
+    /* Schema Table Styling */
+    .db-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 1rem;
+    }
+    .db-table th {
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid #cbd5e1;
+      text-align: left;
+    }
+    .db-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
+    }
+    .db-table tr:hover td { background-color: #f8fafc; }
+
+    pre {
+      background: #0f172a;
+      color: #38bdf8;
       padding: 1.25rem;
       border-radius: 8px;
-      border: 1px solid #cbd5e1;
+      font-family: monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+      line-height: 1.5;
     }
-    .schema-box h4 { color: #0284c7; font-size: 1rem; margin-bottom: 0.5rem; font-weight: 700; }
-    .schema-box ul { list-style: none; margin-top: 0.5rem; }
-    .schema-box li { font-size: 0.88rem; color: #334155; padding: 0.25rem 0; font-family: monospace; }
 
-    code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem; color: #0f172a; }
+    code {
+      background: #f1f5f9;
+      color: #0284c7;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.84rem;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Navigation Bar -->
+  <!-- Top Navigation Header -->
   <header class="navbar">
-    <h1>Nonprofit Executive Analytics Portal</h1>
-    <nav>
-      <ul class="nav-links">
-        <li><a href="index.html">Dashboard</a></li>
-        <li><a href="insights.html">Executive Insights</a></li>
-        <li><a href="data-pipeline.html" class="active">Data Warehouse Hub</a></li>
-        <li><a href="about.html">About & Guide</a></li>
-      </ul>
-    </nav>
+    <div class="nav-left">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation Menu">☰</button>
+      <h1>Nonprofit Executive Analytics Portal</h1>
+    </div>
+    <div class="nav-right">
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
   </header>
 
+  <!-- Slide-out Sidebar Drawer -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Navigation Menu</h3>
+      <button class="close-btn" onclick="toggleSidebar()">&times;</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="index.html">Dashboard</a></li>
+      <li><a href="insights.html">Executive Insights</a></li>
+      <li><a href="data-pipeline.html" class="active">Data Warehouse Hub</a></li>
+      <li><a href="about.html">Overview & Guide</a></li>
+      <li><a href="account.html">My Account</a></li>
+      <li class="menu-divider"></li>
+      <li><a href="#" onclick="logout()" style="color: #ef4444;">Sign Out</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content Container -->
   <main class="main-container">
-    <div class="page-header">
-      <h2 class="page-title">Data Warehouse Hub & Pipeline Health</h2>
-      <p class="page-subtitle">Technical transparency into database transformations, batch execution logs, and data dictionary catalogs for <code>nonprofit_dw</code>.</p>
+
+    <div class="page-header-row">
+      <h2 class="page-title">Data Warehouse & ELT Pipeline Hub</h2>
+      <p class="page-subtitle">Technical specifications for native PostgreSQL schemas, star-schema dimension/fact tables, and ERD relational mapping.</p>
     </div>
 
-    <!-- Database Banner -->
-    <div class="summary-box">
-      <h3>💡 Database Layer Alignment</h3>
+    <!-- ELT Architecture Card -->
+    <div class="doc-card">
+      <h3 class="card-title">Source-to-Target Pipeline Workflow</h3>
       <p>
-        This page documents the technical schema layer powering <code>nonprofit_dw</code>. Raw data enters through the <code>staging</code> schema before being transformed into normalized fact and dimension structures for executive reporting.
-      </p>
-    </div>
-
-    <!-- Star Schema Card -->
-    <div class="card">
-      <h3>Expanded Star Schema Architecture (<code>nonprofit_dw</code>)</h3>
-      <p>
-        To support multi-dimensional reporting across fundraising, volunteer efforts, and program impact, our ELT pipeline aggregates raw operational sources from <code>staging</code> into unified warehouse tables:
+        The platform operates on a native local PostgreSQL database engine (<code>nonprofit_dw</code>). Raw operational feeds land in staging schemas prior to execution through Node.js transactional logic and normalization into core star-schema tables.
       </p>
 
-      <div class="schema-grid">
-        <div class="schema-box">
-          <h4>Staging Ingestion</h4>
-          <ul>
-            <li><code>staging.stg_raw_donors_giving</code></li>
-            <li><code>staging.stg_raw_resource_distribution</code></li>
-          </ul>
+      <div class="pipeline-steps">
+        <div class="step-box">
+          <div class="step-num">Step 1</div>
+          <div class="step-title">Raw Ingestion</div>
+          <div class="step-desc">Ingests raw payloads into <code>stg_raw_donors_giving</code> and <code>stg_raw_resource_distribution</code> schemas without altering raw types.</div>
         </div>
-
-        <div class="schema-box">
-          <h4>Warehouse Fact Tables</h4>
-          <ul>
-            <li><code>fact_donations</code></li>
-            <li><code>fact_resource_distribution</code></li>
-            <li><code>fact_volunteer_activity</code></li>
-          </ul>
+        <div class="step-box">
+          <div class="step-num">Step 2</div>
+          <div class="step-title">Node.js ELT Validation</div>
+          <div class="step-desc">Backend <code>pg</code> client enforces UUID mapping, trims whitespace, and hashes credentials with <code>bcryptjs</code> (10 salt rounds).</div>
         </div>
-
-        <div class="schema-box">
-          <h4>Warehouse Dimension Tables</h4>
-          <ul>
-            <li><code>dim_donors</code></li>
-            <li><code>dim_hubs</code></li>
-            <li><code>dim_campaigns</code></li>
-            <li><code>dim_resources</code></li>
-          </ul>
+        <div class="step-box">
+          <div class="step-num">Step 3</div>
+          <div class="step-title">Analytics Warehouse</div>
+          <div class="step-desc">Normalized star-schema tables (<code>fact_donations</code>, <code>fact_volunteer_activity</code>) join tenant organizations for rapid indexed querying.</div>
         </div>
       </div>
     </div>
 
-    <!-- Technical Pipeline Workflow -->
-    <div class="card">
-      <h3>Automated API Data Pipeline Workflow</h3>
+    <!-- ERD Visual Card -->
+    <div class="doc-card">
+      <h3 class="card-title">Complete Entity-Relationship Diagram (ERD)</h3>
       <p>
-        1. <strong>Extraction:</strong> Raw CSV uploads and API webhooks land directly into the PostgreSQL <code>staging</code> schema.<br>
-        2. <strong>Transformation:</strong> Automated scripts clean null values, normalize date formats, and compute key metrics (like CPDR and labor values).<br>
-        3. <strong>Serving Layer:</strong> The lightweight PHP PDO API (<code>api/get_dashboard_data.php</code>) fetches query results and serves formatted JSON payloads directly to Chart.js and frontend tables.
+        Visual architecture map displaying multi-tenant row-level isolation anchored by parent <code>organizations</code> foreign keys across all dimension and fact tables.
       </p>
+
+      <div style="background: #0f172a; padding: 1.5rem; border-radius: 8px; overflow-x: auto; text-align: center;">
+        <svg viewBox="0 0 920 520" style="width: 100%; max-width: 880px; height: auto;">
+          <!-- 1. ORGANIZATIONS (CENTER ANCHOR) -->
+          <rect x="340" y="20" width="240" height="130" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2.5"/>
+          <text x="460" y="45" fill="#38bdf8" font-family="sans-serif" font-weight="bold" font-size="14" text-anchor="middle">ORGANIZATIONS (Tenants)</text>
+          <line x1="340" y1="55" x2="580" y2="55" stroke="#334155" stroke-width="1"/>
+          <text x="350" y="75" fill="#38bdf8" font-family="monospace" font-size="12">🔑 org_id (PK)</text>
+          <text x="350" y="93" fill="#cbd5e1" font-family="sans-serif" font-size="12">org_name, subscription_tier</text>
+          <text x="350" y="111" fill="#cbd5e1" font-family="sans-serif" font-size="12">is_active (BOOLEAN)</text>
+          <text x="350" y="129" fill="#94a3b8" font-family="sans-serif" font-size="11">created_at (TIMESTAMP)</text>
+
+          <!-- 2. USERS TABLE (LEFT TOP) -->
+          <rect x="20" y="20" width="230" height="150" rx="6" fill="#1e293b" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="135" y="42" fill="#f8fafc" font-family="sans-serif" font-weight="bold" font-size="13" text-anchor="middle">USERS</text>
+          <line x1="20" y1="50" x2="250" y2="50" stroke="#334155" stroke-width="1"/>
+          <text x="30" y="68" fill="#cbd5e1" font-family="monospace" font-size="11">🔑 user_id (PK)</text>
+          <text x="30" y="85" fill="#38bdf8" font-family="monospace" font-size="11">org_id (FK CASCADE)</text>
+          <text x="30" y="102" fill="#94a3b8" font-family="sans-serif" font-size="11">full_name, email (UNIQUE)</text>
+          <text x="30" y="119" fill="#94a3b8" font-family="sans-serif" font-size="11">password_hash, role</text>
+          <text x="30" y="136" fill="#94a3b8" font-family="sans-serif" font-size="11">created_at (TIMESTAMP)</text>
+
+          <!-- 3. DIM DONORS (RIGHT TOP) -->
+          <rect x="670" y="20" width="230" height="150" rx="6" fill="#1e293b" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="785" y="42" fill="#f8fafc" font-family="sans-serif" font-weight="bold" font-size="13" text-anchor="middle">DIM_DONORS</text>
+          <line x1="670" y1="50" x2="900" y2="50" stroke="#334155" stroke-width="1"/>
+          <text x="680" y="68" fill="#cbd5e1" font-family="monospace" font-size="11">🔑 donor_id (PK)</text>
+          <text x="680" y="85" fill="#38bdf8" font-family="monospace" font-size="11">org_id (FK CASCADE)</text>
+          <text x="680" y="102" fill="#94a3b8" font-family="sans-serif" font-size="11">full_name_or_entity</text>
+          <text x="680" y="119" fill="#94a3b8" font-family="sans-serif" font-size="11">donor_type, email</text>
+          <text x="680" y="136" fill="#94a3b8" font-family="sans-serif" font-size="11">created_at (TIMESTAMP)</text>
+
+          <!-- 4. DIM HUBS (LEFT BOTTOM) -->
+          <rect x="20" y="340" width="230" height="130" rx="6" fill="#1e293b" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="135" y="362" fill="#f8fafc" font-family="sans-serif" font-weight="bold" font-size="13" text-anchor="middle">DIM_HUBS</text>
+          <line x1="20" y1="370" x2="250" y2="370" stroke="#334155" stroke-width="1"/>
+          <text x="30" y="388" fill="#cbd5e1" font-family="monospace" font-size="11">🔑 hub_id (PK)</text>
+          <text x="30" y="405" fill="#38bdf8" font-family="monospace" font-size="11">org_id (FK CASCADE)</text>
+          <text x="30" y="422" fill="#94a3b8" font-family="sans-serif" font-size="11">hub_name (VARCHAR 255)</text>
+          <text x="30" y="439" fill="#94a3b8" font-family="sans-serif" font-size="11">region (VARCHAR 100)</text>
+
+          <!-- 5. FACT DONATIONS (CENTER RIGHT BOTTOM) -->
+          <rect x="630" y="270" width="270" height="190" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+          <text x="765" y="292" fill="#10b981" font-family="sans-serif" font-weight="bold" font-size="14" text-anchor="middle">FACT_DONATIONS</text>
+          <line x1="630" y1="300" x2="900" y2="300" stroke="#334155" stroke-width="1"/>
+          <text x="640" y="318" fill="#cbd5e1" font-family="monospace" font-size="11">🔑 donation_id (PK)</text>
+          <text x="640" y="335" fill="#38bdf8" font-family="monospace" font-size="11">org_id (FK CASCADE)</text>
+          <text x="640" y="352" fill="#38bdf8" font-family="monospace" font-size="11">donor_id (FK dim_donors)</text>
+          <text x="640" y="369" fill="#94a3b8" font-family="sans-serif" font-size="11">payment_method (VARCHAR 50)</text>
+          <text x="640" y="386" fill="#94a3b8" font-family="sans-serif" font-size="11">amount (DECIMAL 12,2)</text>
+          <text x="640" y="403" fill="#94a3b8" font-family="sans-serif" font-size="11">transaction_date (DATE)</text>
+          <text x="640" y="420" fill="#94a3b8" font-family="sans-serif" font-size="11">created_at (TIMESTAMP)</text>
+          <text x="640" y="442" fill="#38bdf8" font-family="monospace" font-size="10">INDEX: (org_id, transaction_date)</text>
+
+          <!-- 6. FACT VOLUNTEER ACTIVITY (CENTER LEFT BOTTOM) -->
+          <rect x="300" y="270" width="280" height="210" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+          <text x="440" y="292" fill="#10b981" font-family="sans-serif" font-weight="bold" font-size="14" text-anchor="middle">FACT_VOLUNTEER_ACTIVITY</text>
+          <line x1="300" y1="300" x2="580" y2="300" stroke="#334155" stroke-width="1"/>
+          <text x="310" y="318" fill="#cbd5e1" font-family="monospace" font-size="11">🔑 log_id (PK)</text>
+          <text x="310" y="335" fill="#38bdf8" font-family="monospace" font-size="11">org_id (FK CASCADE)</text>
+          <text x="310" y="352" fill="#38bdf8" font-family="monospace" font-size="11">hub_id (FK dim_hubs)</text>
+          <text x="310" y="369" fill="#94a3b8" font-family="sans-serif" font-size="11">volunteer_id (VARCHAR 36)</text>
+          <text x="310" y="386" fill="#94a3b8" font-family="sans-serif" font-size="11">activity_category (VARCHAR 100)</text>
+          <text x="310" y="403" fill="#94a3b8" font-family="sans-serif" font-size="11">hours_contributed (DECIMAL 8,2)</text>
+          <text x="310" y="420" fill="#94a3b8" font-family="sans-serif" font-size="11">economic_rate (DEFAULT 31.80)</text>
+          <text x="310" y="437" fill="#94a3b8" font-family="sans-serif" font-size="11">shift_date (DATE)</text>
+          <text x="310" y="459" fill="#38bdf8" font-family="monospace" font-size="10">INDEX: (org_id, hub_id)</text>
+
+          <!-- CONNECTING LINES WITH ARROWS -->
+          <!-- Org to Users -->
+          <path d="M 340 85 L 250 85" stroke="#0284c7" stroke-width="2"/>
+          <!-- Org to Dim Donors -->
+          <path d="M 580 85 L 670 85" stroke="#0284c7" stroke-width="2"/>
+          <!-- Org to Dim Hubs -->
+          <path d="M 400 150 L 250 360" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="4"/>
+          <!-- Org to Fact Donations -->
+          <path d="M 540 150 L 630 280" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="4"/>
+          <!-- Org to Fact Volunteer Activity -->
+          <path d="M 460 150 L 460 270" stroke="#0284c7" stroke-width="2"/>
+          <!-- Dim Donors to Fact Donations -->
+          <path d="M 785 170 L 785 270" stroke="#10b981" stroke-width="2"/>
+          <!-- Dim Hubs to Fact Volunteer Activity -->
+          <path d="M 250 400 L 300 400" stroke="#10b981" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Schema Table Documentation -->
+    <div class="doc-card">
+      <h3 class="card-title">Detailed Database Schema Specifications</h3>
+      <p>
+        Full field specifications across all 6 core relational tables in <code>nonprofit_dw</code>:
+      </p>
+
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th>Table Name</th>
+            <th>Primary Key</th>
+            <th>Columns & Types</th>
+            <th>Foreign Keys & Constraints</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>organizations</code></td>
+            <td><code>org_id</code></td>
+            <td><code>org_name</code>, <code>subscription_tier</code>, <code>is_active</code>, <code>created_at</code></td>
+            <td>Parent Tenant table. Default tier: 'Starter'.</td>
+          </tr>
+          <tr>
+            <td><code>users</code></td>
+            <td><code>user_id</code></td>
+            <td><code>org_id</code>, <code>full_name</code>, <code>email</code>, <code>password_hash</code>, <code>role</code>, <code>created_at</code></td>
+            <td><code>org_id ➔ organizations(org_id) ON DELETE CASCADE</code></td>
+          </tr>
+          <tr>
+            <td><code>dim_donors</code></td>
+            <td><code>donor_id</code></td>
+            <td><code>org_id</code>, <code>full_name_or_entity</code>, <code>donor_type</code>, <code>email</code>, <code>created_at</code></td>
+            <td><code>org_id ➔ organizations(org_id) ON DELETE CASCADE</code></td>
+          </tr>
+          <tr>
+            <td><code>dim_hubs</code></td>
+            <td><code>hub_id</code></td>
+            <td><code>org_id</code>, <code>hub_name</code>, <code>region</code></td>
+            <td><code>org_id ➔ organizations(org_id) ON DELETE CASCADE</code></td>
+          </tr>
+          <tr>
+            <td><code>fact_donations</code></td>
+            <td><code>donation_id</code></td>
+            <td><code>org_id</code>, <code>donor_id</code>, <code>payment_method</code>, <code>amount</code>, <code>transaction_date</code>, <code>created_at</code></td>
+            <td>
+              <code>org_id ➔ organizations(org_id)</code><br>
+              <code>donor_id ➔ dim_donors(donor_id)</code>
+            </td>
+          </tr>
+          <tr>
+            <td><code>fact_volunteer_activity</code></td>
+            <td><code>log_id</code></td>
+            <td><code>org_id</code>, <code>volunteer_id</code>, <code>hub_id</code>, <code>activity_category</code>, <code>hours_contributed</code>, <code>economic_rate</code>, <code>shift_date</code></td>
+            <td>
+              <code>org_id ➔ organizations(org_id)</code><br>
+              <code>hub_id ➔ dim_hubs(hub_id)</code>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SQL DDL Preview -->
+    <div class="doc-card">
+      <h3 class="card-title">Production DDL & Composite Indexes</h3>
+      <p>DDL definitions from <code>schema.sql</code> creating the multi-tenant relational star schema and performance indexes:</p>
+      <pre><code>-- Indexes for Fast Analytics Querying
+CREATE INDEX idx_donations_org_date ON fact_donations(org_id, transaction_date);
+CREATE INDEX idx_volunteer_org_hub ON fact_volunteer_activity(org_id, hub_id);
+
+-- Fact Donations Table DDL
+CREATE TABLE IF NOT EXISTS fact_donations (
+    donation_id VARCHAR(36) PRIMARY KEY,
+    org_id VARCHAR(36) NOT NULL,
+    donor_id VARCHAR(36) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    amount DECIMAL(12, 2) NOT NULL,
+    transaction_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (org_id) REFERENCES organizations(org_id) ON DELETE CASCADE,
+    FOREIGN KEY (donor_id) REFERENCES dim_donors(donor_id)
+);</code></pre>
     </div>
 
   </main>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+    }
+
+    function logout() {
+      localStorage.removeItem('userOrg');
+      window.location.href = 'login.html';
+    }
+  </script>
 
 </body>
 </html>

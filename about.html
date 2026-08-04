@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nonprofit Executive Analytics Portal - About & User Guide</title>
+  <title>Nonprofit Executive Analytics Portal - About & Guide</title>
   
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,12 +15,12 @@
     body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
 
     /* Typography Upgrades */
-    h1, h2, h3, h4, .navbar h1, .page-title {
+    h1, h2, h3, .navbar h1, .page-title, .card-title {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       letter-spacing: -0.02em;
     }
 
-    /* Top Navigation */
+    /* Top Navigation Header */
     .navbar {
       background-color: #0f172a;
       color: #ffffff;
@@ -29,7 +29,30 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 10;
     }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    
+    /* Clean Hamburger Button */
+    .hamburger-btn {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-size: 1.6rem;
+      padding: 0.2rem 0.4rem;
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .hamburger-btn:hover {
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+
     .navbar h1 { 
       font-size: 1.3rem; 
       font-weight: 800; 
@@ -38,171 +61,297 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
-    .nav-links a { color: #94a3b8; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s ease; }
-    .nav-links a.active, .nav-links a:hover { color: #38bdf8; }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+
+    .btn-logout {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.85rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-logout:hover { background: #dc2626; }
+
+    /* Slide-out Sidebar Drawer */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -290px;
+      width: 290px;
+      height: 100vh;
+      background-color: #0f172a;
+      color: #fff;
+      z-index: 1000;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar.open { left: 0; }
+
+    .sidebar-header {
+      padding: 1.25rem 1.5rem;
+      background: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    .sidebar-header h3 { font-size: 1rem; color: #38bdf8; font-weight: 700; }
+    .close-btn { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; }
+    .close-btn:hover { color: #fff; }
+
+    .sidebar-menu { list-style: none; padding: 1rem 0; flex: 1; }
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1.5rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+    .sidebar-menu li a:hover, .sidebar-menu li a.active {
+      background: #1e293b;
+      color: #38bdf8;
+      border-left: 4px solid #38bdf8;
+    }
+    .menu-divider { height: 1px; background: #334155; margin: 0.75rem 0; }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
     /* Layout Container */
     .main-container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1; }
-    .page-header { margin-bottom: 2rem; }
-    .page-title { font-size: 1.8rem; font-weight: 700; color: #0f172a; }
-    .page-subtitle { font-size: 1rem; color: #64748b; margin-top: 0.25rem; }
 
-    /* Elevated Cards */
-    .card { 
-      background: #ffffff; 
-      padding: 2rem; 
-      border-radius: 10px; 
-      border: 1px solid #cbd5e1; 
-      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.09), 0 4px 6px -2px rgba(15, 23, 42, 0.04); 
-      margin-bottom: 1.75rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 25px -5px rgba(15, 23, 42, 0.12), 0 6px 10px -2px rgba(15, 23, 42, 0.06);
-    }
-    .card h3 { font-size: 1.25rem; color: #0f172a; margin-bottom: 0.85rem; border-bottom: 2px solid #38bdf8; padding-bottom: 0.4rem; display: inline-block; }
-    .card p { font-size: 0.95rem; line-height: 1.7; color: #334155; margin-bottom: 1.1rem; }
-    .card p:last-child { margin-bottom: 0; }
+    .page-header-row { margin-bottom: 1.5rem; }
+    .page-title { font-size: 1.6rem; font-weight: 700; color: #0f172a; }
+    .page-subtitle { font-size: 0.88rem; color: #64748b; margin-top: 0.2rem; }
 
-    /* Persona Grid */
-    .persona-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
-    .persona-box {
-      background: #f8fafc;
-      padding: 1.25rem;
-      border-radius: 8px;
+    /* Guide Content Cards */
+    .guide-card {
+      background: #ffffff;
+      border-radius: 10px;
       border: 1px solid #cbd5e1;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
     }
-    .persona-box h4 { color: #0284c7; font-size: 1rem; margin-bottom: 0.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem; }
-    .persona-box p { font-size: 0.88rem; color: #334155; line-height: 1.5; margin: 0; }
+    .card-title {
+      font-size: 1.2rem;
+      color: #0f172a;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .guide-card p {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #334155;
+      margin-bottom: 1rem;
+    }
+    .guide-card p:last-child { margin-bottom: 0; }
 
-    /* Table Styling */
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
-    th { background-color: #f1f5f9; color: #475569; font-weight: 600; padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #cbd5e1; }
-    td { padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; color: #334155; line-height: 1.5; }
-    code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem; color: #0f172a; }
+    /* Feature Grid inside Guide */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    .feature-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+    .feature-box h4 {
+      font-size: 0.98rem;
+      color: #0284c7;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .feature-box p {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 0;
+    }
+
+    /* 2-Column Grid Layout for Shorter Tech Sections */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .tech-grid .guide-card {
+      margin-bottom: 0; /* Remove bottom margin inside grid */
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 768px) {
+      .tech-grid {
+        grid-template-columns: 1fr; /* Stack vertically on smaller screens */
+      }
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #0f172a;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Navigation Bar -->
+  <!-- Top Navigation Header -->
   <header class="navbar">
-    <h1>Nonprofit Executive Analytics Portal</h1>
-    <nav>
-      <ul class="nav-links">
-        <li><a href="index.html">Dashboard</a></li>
-        <li><a href="insights.html">Executive Insights</a></li>
-        <li><a href="data-pipeline.html">Data Warehouse Hub</a></li>
-        <li><a href="about.html" class="active">About & Guide</a></li>
-      </ul>
-    </nav>
+    <div class="nav-left">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation Menu">☰</button>
+      <h1>Nonprofit Executive Analytics Portal</h1>
+    </div>
+    <div class="nav-right">
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
   </header>
 
+  <!-- Slide-out Sidebar Drawer -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Navigation Menu</h3>
+      <button class="close-btn" onclick="toggleSidebar()">&times;</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="index.html">Dashboard</a></li>
+      <li><a href="insights.html">Executive Insights</a></li>
+      <li><a href="data-pipeline.html">Data Warehouse Hub</a></li>
+      <li><a href="about.html" class="active">Overview & Guide</a></li>
+      <li><a href="account.html">My Account</a></li>
+      <li class="menu-divider"></li>
+      <li><a href="#" onclick="logout()" style="color: #ef4444;">🚪 Sign Out</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content Container -->
   <main class="main-container">
-    <div class="page-header">
+
+    <div class="page-header-row">
       <h2 class="page-title">System Overview & User Guide</h2>
-      <p class="page-subtitle">A comprehensive guide detailing the purpose, strategic importance, and target audience for the portal.</p>
+      <p class="page-subtitle">A comprehensive guide detailing the purpose, architecture, and operational data pipelines behind the portal.</p>
     </div>
 
-    <!-- Section 1: System Purpose -->
-    <div class="card">
-      <h3>What Is This System?</h3>
+    <!-- What Is This System -->
+    <div class="guide-card">
+      <h3 class="card-title">💡 What Is This System?</h3>
       <p>
-        The <strong>Nonprofit Executive Analytics Portal</strong> is an enterprise reporting platform designed to consolidate fragmented operational datasets into a single, cohesive dashboard. Modern nonprofit organizations manage complex operational ecosystems—ranging from digital donor management systems (CRM) and payment processing gateways to regional warehouse distribution networks and volunteer scheduling platforms.
+        The <strong>Nonprofit Executive Analytics Portal</strong> provides non-profit leaders with real-time visibility into donor contributions, volunteer human capital, and physical aid distribution through a single, cohesive dashboard. Nonprofits often struggle with fragmented donor systems (CRM) and payment processing gateways. This portal unifies those sources into actionable business intelligence.
       </p>
       <p>
-        Operating behind the web portal is a normalized relational database warehouse (<code>nonprofit_dw</code>) organized into a star schema structure. The system automatically ingests uncleaned transaction logs into an isolated <code>staging</code> schema before executing automated transformations. These cleaned records hydrate interactive Chart.js visualizations, financial transaction tables, volunteer human capital logs, and high-level KPI cards in real time via an asynchronous JavaScript API pipeline (<code>api/get_dashboard_data.php</code>).
-      </p>
-    </div>
-
-    <!-- Section 2: Strategic Importance -->
-    <div class="card">
-      <h3>Why Is This Analytics Portal Important?</h3>
-      <p>
-        In the mission-driven sector, organizational survival and impact growth depend on transparency, operational efficiency, and rapid decision-making. Nonprofits frequently operate under strict institutional oversight where major grantors, board members, and public donors expect rigorous accountability for every dollar received and spent.
-      </p>
-      <p>
-        By bridging the gap between raw backend databases and executive presentation layers, this portal solves several critical operational challenges:
-      </p>
-      <p>
-        • <strong>Eliminates Data Silos:</strong> Financial contributions and physical aid distributions are evaluated side-by-side, giving leadership a holistic view of institutional health.<br>
-        • <strong>Quantifies Non-Monetary Impact:</strong> Incorporates Independent Sector national baseline valuations ($31.80/hour) to translate raw volunteer shift hours into quantifiable labor capital for grant matching.<br>
-        • <strong>Optimizes Fundraising Efficiency:</strong> Tracks Cost Per Dollar Raised (CPDR) and campaign acquisition ROI across marketing channels to ensure organizational overhead remains lean and accountable.
+        Operating behind the web portal is a normalized database architecture (ELT data pipeline) that automatically ingests uncleaned transaction logs and transforms them into star-schema analytics tables.
       </p>
     </div>
 
-    <!-- Section 3: Target Audience / Stakeholder Personas -->
-    <div class="card">
-      <h3>Who Is This System Built For?</h3>
-      <p>
-        The portal is specifically tailored to meet the distinct operational requirements of key non-technical leadership personas across the organization:
-      </p>
-
-      <div class="persona-grid">
-        <div class="persona-box">
-          <h4>👔 Executive Leadership & Board Members</h4>
-          <p>
-            Requires rapid, high-level strategic summaries. They utilize the 6 KPI cards and Executive Insights tab to evaluate fiscal health, verify grant compliance, and monitor overhead metrics like Cost Per Dollar Raised.
-          </p>
+    <!-- Core Portal Modules -->
+    <div class="guide-card">
+      <h3 class="card-title">Core Portal Modules</h3>
+      <div class="feature-grid">
+        
+        <div class="feature-box">
+          <h4>Executive Dashboard</h4>
+          <p>Real-time KPI metrics tracking gross monetary raised, active donor count, volunteer labor economic value, and distribution throughput.</p>
         </div>
 
-        <div class="persona-box">
-          <h4>📦 Operations & Logistics Managers</h4>
-          <p>
-            Focuses on regional resource distribution and supply throughput. They leverage the 3×1 vertical charts and distribution hub filters to spot inventory bottlenecks and rebalance shipments across regional facilities.
-          </p>
+        <div class="feature-box">
+          <h4>Executive Insights</h4>
+          <p>Automated word-based narrative findings dynamically evaluated based on active dashboard filter states and KPI shifts.</p>
         </div>
 
-        <div class="persona-box">
-          <h4>📣 Development & Marketing Teams</h4>
-          <p>
-            Evaluates donor retention and campaign ROI. They utilize the Campaign Revenue vs. Marketing Budget visualizations and CSV data export controls to refine acquisition strategies and target high-yield donor segments.
-          </p>
+        <div class="feature-box">
+          <h4>Data Warehouse Hub</h4>
+          <p>Technical documentation detailing source-to-target ELT workflows, staging schemas, dbt transformation pipelines, and relational ERDs.</p>
         </div>
+
+        <div class="feature-box">
+          <h4>My Account & Org</h4>
+          <p>Tenant account settings displaying active organization IDs, subscription tiers, and row-level data isolation parameters.</p>
+        </div>
+
       </div>
     </div>
 
-    <!-- Section 4: Plain-English Data Glossary -->
-    <div class="card">
-      <h3>Plain-English Data Glossary</h3>
-      <p>
-        To ensure technical clarity across departments, key database terms and calculated metrics are defined below:
-      </p>
+    <!-- 2-Column Grid Row 1: Architecture & Commercial Readiness -->
+    <div class="tech-grid">
+      
+      <div class="guide-card">
+        <h3 class="card-title">Architecture & Multi-Tenancy</h3>
+        <p>
+          This portal is built for enterprise micro-SaaS deployment. Every query executed via <code>api/get_dashboard_data.php</code> is strictly scoped by the authenticated user's <code>org_id</code> session variable.
+        </p>
+        <p>
+          Volunteer labor values are dynamically evaluated using Independent Sector national standards (<strong>$31.80/hour</strong>), giving executives instantly verifiable metrics for grant reporting and auditing.
+        </p>
+      </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Term / Field</th>
-            <th>What It Means in Plain English</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>staging.stg_raw_*</code></td>
-            <td>Staging schema tables in <code>nonprofit_dw</code> that temporarily store raw, uncleaned input data prior to transformation.</td>
-          </tr>
-          <tr>
-            <td><code>donor_id</code></td>
-            <td>A unique identifier assigned to each donor or organization to track giving history while maintaining privacy standards.</td>
-          </tr>
-          <tr>
-            <td><code>quantity_delta</code></td>
-            <td>The net change in physical warehouse inventory (positive numbers reflect incoming supplies; negative numbers reflect shipped aid).</td>
-          </tr>
-          <tr>
-            <td><code>Cost Per Dollar Raised (CPDR)</code></td>
-            <td>A fundraising efficiency ratio calculated by dividing marketing/event expenses by total funds raised ($0.12 means it costs 12 cents to raise $1.00).</td>
-          </tr>
-          <tr>
-            <td><code>Volunteer Labor Economic Value</code></td>
-            <td>Estimated financial value assigned to volunteer hours using Independent Sector national standards ($31.80/hour) for grant reporting.</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="guide-card">
+        <h3 class="card-title">Commercial & Marketplace Readiness</h3>
+        <p>
+          Engineered specifically for clean asset transfer on micro-acquisition platforms like Acquire.com and Flippa, the codebase follows strict modular standards with zero complex cloud lock-in.
+        </p>
+        <p>
+          The built-in self-service tenant registration and onboarding loop allow the platform to operate fully autonomously as a scalable B2B SaaS business.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Full-Width Security Card -->
+    <div class="guide-card">
+      <h3 class="card-title">Security & Data Isolation</h3>
+      <p>
+        Data privacy is enforced at the database query level. Using strict PDO prepared statements, parameterized queries eliminate SQL injection vectors while session tokens guard against unauthorized endpoint probing. Multi-tenant partitioning guarantees organization data remains strictly segregated.
+      </p>
     </div>
 
   </main>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+    }
+
+    function logout() {
+      localStorage.removeItem('userOrg');
+      window.location.href = 'login.html';
+    }
+  </script>
 
 </body>
 </html>

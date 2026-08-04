@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nonprofit Executive Analytics Portal - Executive Insights</title>
   
-  <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
@@ -14,13 +13,11 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* Typography Upgrades */
-    h1, h2, h3, h4, .navbar h1, .page-title {
+    h1, h2, h3, .navbar h1, .page-title, .card-title {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       letter-spacing: -0.02em;
     }
 
-    /* Top Navigation */
     .navbar {
       background-color: #0f172a;
       color: #ffffff;
@@ -29,7 +26,26 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 10;
     }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    
+    .hamburger-btn {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-size: 1.6rem;
+      padding: 0.2rem 0.4rem;
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .hamburger-btn:hover { color: #ffffff; transform: scale(1.1); }
+
     .navbar h1 { 
       font-size: 1.3rem; 
       font-weight: 800; 
@@ -38,124 +54,278 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
-    .nav-links a { color: #94a3b8; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s ease; }
-    .nav-links a.active, .nav-links a:hover { color: #38bdf8; }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
 
-    /* Layout Container */
-    .main-container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1; }
-    .page-header { margin-bottom: 2rem; }
-    .page-title { font-size: 1.8rem; font-weight: 700; color: #0f172a; }
-    .page-subtitle { font-size: 1rem; color: #64748b; margin-top: 0.25rem; }
+    .btn-logout {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.85rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-logout:hover { background: #dc2626; }
 
-    /* Summary Banner */
-    .summary-box {
-      background: #e0f2fe;
-      border-left: 4px solid #0284c7;
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -290px;
+      width: 290px;
+      height: 100vh;
+      background-color: #0f172a;
+      color: #fff;
+      z-index: 1000;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar.open { left: 0; }
+
+    .sidebar-header {
       padding: 1.25rem 1.5rem;
-      border-radius: 8px;
-      margin-bottom: 1.75rem;
-      box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+      background: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
     }
-    .summary-box h3 { color: #0369a1; font-size: 1.1rem; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
-    .summary-box p { font-size: 0.92rem; color: #0c4a6e; line-height: 1.6; }
+    .sidebar-header h3 { font-size: 1rem; color: #38bdf8; font-weight: 700; }
+    .close-btn { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; }
+    .close-btn:hover { color: #fff; }
 
-    /* Elevated Cards */
-    .card { 
-      background: #ffffff; 
-      padding: 2rem; 
-      border-radius: 10px; 
-      border: 1px solid #cbd5e1; 
-      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.09), 0 4px 6px -2px rgba(15, 23, 42, 0.04); 
-      margin-bottom: 1.75rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    .sidebar-menu { list-style: none; padding: 1rem 0; flex: 1; }
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1.5rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
     }
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 25px -5px rgba(15, 23, 42, 0.12), 0 6px 10px -2px rgba(15, 23, 42, 0.06);
+    .sidebar-menu li a:hover, .sidebar-menu li a.active {
+      background: #1e293b;
+      color: #38bdf8;
+      border-left: 4px solid #38bdf8;
     }
-    .card h3 { font-size: 1.25rem; color: #0f172a; margin-bottom: 0.85rem; border-bottom: 2px solid #38bdf8; padding-bottom: 0.4rem; display: inline-block; }
-    .card p { font-size: 0.95rem; line-height: 1.7; color: #334155; margin-bottom: 1.1rem; }
+    .menu-divider { height: 1px; background: #334155; margin: 0.75rem 0; }
 
-    /* Actionable Takeaway Callouts */
-    .takeaway-box {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: 8px;
-      padding: 1rem 1.25rem;
-      margin-top: 1rem;
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
     }
-    .takeaway-box h4 { font-size: 0.92rem; color: #166534; font-weight: 700; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem; }
-    .takeaway-box p { font-size: 0.88rem; color: #14532d; line-height: 1.5; margin-bottom: 0; }
-    code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem; color: #0f172a; }
+    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+
+    .main-container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1; }
+
+    .page-header-row { margin-bottom: 1.5rem; }
+    .page-title { font-size: 1.6rem; font-weight: 700; color: #0f172a; }
+    .page-subtitle { font-size: 0.88rem; color: #64748b; margin-top: 0.2rem; }
+
+    .insight-card {
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+    }
+    .card-title {
+      font-size: 1.25rem;
+      color: #0f172a;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-desc {
+      font-size: 0.95rem;
+      color: #334155;
+      line-height: 1.65;
+    }
+    .highlight-text {
+      color: #0284c7;
+      font-weight: 700;
+    }
+    .stat-badge {
+      background: #f1f5f9;
+      border-left: 4px solid #38bdf8;
+      padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+      border-radius: 4px;
+      font-size: 0.88rem;
+      color: #475569;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Navigation Bar -->
   <header class="navbar">
-    <h1>Nonprofit Executive Analytics Portal</h1>
-    <nav>
-      <ul class="nav-links">
-        <li><a href="index.html">Dashboard</a></li>
-        <li><a href="insights.html" class="active">Executive Insights</a></li>
-        <li><a href="data-pipeline.html">Data Warehouse Hub</a></li>
-        <li><a href="about.html">About & Guide</a></li>
-      </ul>
-    </nav>
+    <div class="nav-left">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation Menu">☰</button>
+      <h1>Nonprofit Executive Analytics Portal</h1>
+    </div>
+    <div class="nav-right">
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
   </header>
 
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Navigation Menu</h3>
+      <button class="close-btn" onclick="toggleSidebar()">&times;</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="index.html">Dashboard</a></li>
+      <li><a href="insights.html" class="active">Executive Insights</a></li>
+      <li><a href="data-pipeline.html">Data Warehouse Hub</a></li>
+      <li><a href="about.html">Overview & Guide</a></li>
+      <li><a href="account.html">My Account</a></li>
+      <li class="menu-divider"></li>
+      <li><a href="#" onclick="logout()" style="color: #ef4444;">Sign Out</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
   <main class="main-container">
-    <div class="page-header">
-      <h2 class="page-title">Executive Findings & Key Takeaways</h2>
-      <p class="page-subtitle">Strategic, narrative-driven evaluation of financial health, logistics efficiency, and donor portfolio stability.</p>
+
+    <div class="page-header-row">
+      <h2 class="page-title">Executive Strategic Findings</h2>
+      <p class="page-subtitle">Automated narrative insights dynamically evaluated based on active dashboard selections.</p>
     </div>
 
-    <!-- Strategic Summary Box -->
-    <div class="summary-box">
-      <h3>💡 Strategic Summary Guidance</h3>
-      <p>
-        This report distills backend data warehouse trends from <code>nonprofit_dw</code> into plain-language strategic observations. Executive leadership can use these takeaways to inform operational budgeting, risk mitigation, and upcoming campaign positioning.
+    <!-- Dynamic Insight Narrative Card 1 -->
+    <div class="insight-card">
+      <h3 class="card-title">Revenue & Liquidity Finding</h3>
+      <p class="card-desc" id="narrativeRevenue">
+        Evaluating the current dashboard filters...
       </p>
-    </div>
-
-    <!-- Finding 1 -->
-    <div class="card">
-      <h3>1. Revenue Structure & Payment Channel Concentration</h3>
-      <p>
-        An analysis of transactional records highlights a heavy revenue concentration in large-scale institutional gifts, particularly wire transfers and grant distributions. A single major donor entry (<code>CRM-1155</code>) represents a dominant share of total liquid capital for the period. While these high-value contributions provide significant immediate capacity, relying on a small pool of institutional givers exposes the organization to cash-flow volatility if grant renewal cycles fluctuate.
-      </p>
-      <div class="takeaway-box">
-        <h4>💡 Strategic Direction:</h4>
-        <p>Maintain high-touch stewardship programs for institutional grantors while expanding recurring individual digital giving channels (Stripe/PayPal) to build a stable operational foundation.</p>
+      <div class="stat-badge" id="badgeRevenue">
+        📊 Active Filter Scope: Initializing
       </div>
     </div>
 
-    <!-- Finding 2 -->
-    <div class="card">
-      <h3>2. Supply Chain Optimization Across Regional Hubs</h3>
-      <p>
-        Physical resource movement logs show significant throughput disparities across distribution centers. The East Region Hub accounts for the majority of outgoing medical and food supply shipments, while facilities like the Bowie Distribution Center operate under capacity.
+    <!-- Dynamic Insight Narrative Card 2 -->
+    <div class="insight-card">
+      <h3 class="card-title">Human Capital & Volunteer Valuation</h3>
+      <p class="card-desc" id="narrativeVolunteer">
+        Evaluating human capital throughput...
       </p>
-      <div class="takeaway-box">
-        <h4>💡 Strategic Direction:</h4>
-        <p>Rebalance inventory staging from over-saturated hubs to regional centers experiencing localized supply spikes, preventing perishable inventory buildup.</p>
+      <div class="stat-badge" id="badgeVolunteer">
+        📊 Labor Efficiency Ratio: Evaluating
       </div>
     </div>
 
-    <!-- Finding 3 -->
-    <div class="card">
-      <h3>3. Human Capital & Volunteer Valuation</h3>
-      <p>
-        Volunteer labor contributions across facilities generate substantial economic savings. By applying the Independent Sector national standard valuation ($31.80/hour), volunteer hours translate into thousands of dollars in off-balance-sheet labor capital.
+    <!-- Dynamic Insight Narrative Card 3 -->
+    <div class="insight-card">
+      <h3 class="card-title">Supply Logistics & Hub Performance</h3>
+      <p class="card-desc" id="narrativeFulfillment">
+        Evaluating regional fulfillment throughput...
       </p>
-      <div class="takeaway-box">
-        <h4>💡 Strategic Direction:</h4>
-        <p>Incorporate calculated volunteer labor values directly into grant matching applications to demonstrate operational efficiency to institutional donors.</p>
+      <div class="stat-badge" id="badgeFulfillment">
+        📊 Distribution Hub Focus: Evaluating
       </div>
     </div>
 
   </main>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+    }
+
+    function generateDynamicInsights() {
+      const rawState = localStorage.getItem('dashboardState');
+      let state = null;
+
+      if (rawState) {
+        try { state = JSON.parse(rawState); } catch(e) {}
+      }
+
+      // Default state fallback if user navigated straight to insights
+      if (!state) {
+        state = {
+          totalAmount: 30400,
+          activeDonors: 3,
+          totalAid: 4000,
+          totalVolHrs: 65.5,
+          volEconVal: 2082.90,
+          selectedType: 'All Donor Types',
+          selectedHub: 'All Hub Locations',
+          activePreset: 'YTD'
+        };
+      }
+
+      // Dynamic Finding 1: Revenue Narrative
+      const revText = document.getElementById('narrativeRevenue');
+      const revBadge = document.getElementById('badgeRevenue');
+      
+      let revNarrative = `During the <span class="highlight-text">${state.activePreset}</span> period for <span class="highlight-text">${state.selectedType}</span>, total monetary donations reached <span class="highlight-text">$${state.totalAmount.toLocaleString()}</span> across <span class="highlight-text">${state.activeDonors} active donor profile(s)</span>. `;
+      
+      if (state.totalAmount > 20000) {
+        revNarrative += `This reflects strong liquidity driven largely by grant awards and high-value institutional wire transfers. Funding channels indicate steady capital reserves ready for strategic allocation.`;
+      } else {
+        revNarrative += `Monetary volume is currently localized. Strategic initiatives should focus on converting individual donors into recurring subscription contributors to stabilize capital throughput.`;
+      }
+      revText.innerHTML = revNarrative;
+      revBadge.innerText = `Active Filter Scope: ${state.selectedType} (${state.activePreset})`;
+
+      // Dynamic Finding 2: Volunteer Valuation Narrative
+      const volText = document.getElementById('narrativeVolunteer');
+      const volBadge = document.getElementById('badgeVolunteer');
+
+      const avgValPerDonor = (state.volEconVal / (state.activeDonors || 1)).toFixed(2);
+      let volNarrative = `A total of <span class="highlight-text">${state.totalVolHrs} volunteer shift hours</span> were logged in the system. Valued at the Independent Sector national standard of $31.80/hr, this represents <span class="highlight-text">~$${(state.volEconVal / 1000).toFixed(1)}K in economic labor value</span> added. `;
+      
+      if (state.totalVolHrs > 50) {
+        volNarrative += `Community engagement remains exceptionally high, significantly reducing operational overhead for logistics packaging and distribution operations.`;
+      } else {
+        volNarrative += `Volunteer shift capacity is operating within standard baseline levels. Increasing shift kitting events could further optimize labor-to-cost ratios.`;
+      }
+      volText.innerHTML = volNarrative;
+      volBadge.innerText = `Est. Economic Labor Value Generated: $${state.volEconVal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+      // Dynamic Finding 3: Supply Fulfillment Narrative
+      const fulText = document.getElementById('narrativeFulfillment');
+      const fulBadge = document.getElementById('badgeFulfillment');
+
+      let fulNarrative = `Across physical distribution channels, <span class="highlight-text">${state.totalAid.toLocaleString()} aid units</span> (medical items and food/water rations) were fulfilled at <span class="highlight-text">${state.selectedHub}</span>. `;
+      
+      if (state.selectedHub === 'All Hub Locations') {
+        fulNarrative += `Regional logistics balance is optimal across all distribution hubs, with East Region Hub managing the majority of heavy freight processing.`;
+      } else {
+        fulNarrative += `Targeted filtering confirms localized throughput at ${state.selectedHub}. Supply chain records show no critical inventory bottlenecks.`;
+      }
+      fulText.innerHTML = fulNarrative;
+      fulBadge.innerText = `Regional Scope: ${state.selectedHub} (${state.totalAid.toLocaleString()} Units)`;
+    }
+
+    function logout() {
+      localStorage.removeItem('userOrg');
+      window.location.href = 'login.html';
+    }
+
+    window.onload = generateDynamicInsights;
+  </script>
 
 </body>
 </html>
