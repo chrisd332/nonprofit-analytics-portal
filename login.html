@@ -1,291 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nonprofit Analytics Portal - Access Portal</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Executive Analytics Portal</title>
+    <!-- Plus Jakarta Sans Font & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body {
-      background-color: #0f172a;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-    }
-    .auth-card {
-      background: #ffffff;
-      width: 100%;
-      max-width: 420px;
-      padding: 2.5rem;
-      border-radius: 12px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-    }
-    .auth-card h2 {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #0f172a;
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #ffffff;
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --accent: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
 
-    /* Tab Switcher */
-    .tab-container {
-      display: flex;
-      border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 1.5rem;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 0.6rem;
-      background: none;
-      border: none;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #64748b;
-      cursor: pointer;
-      transition: all 0.2s;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
-    }
-    .tab-btn.active {
-      color: #0284c7;
-      border-bottom-color: #0284c7;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
 
-    .form-group { margin-bottom: 1.15rem; }
-    .form-group label {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #475569;
-      margin-bottom: 0.4rem;
-    }
-    .form-group input {
-      width: 100%;
-      padding: 0.65rem 0.85rem;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      font-size: 0.95rem;
-      color: #0f172a;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .form-group input:focus { border-color: #0284c7; }
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(30, 41, 59, 0.8) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-    .btn-submit {
-      width: 100%;
-      background: #0284c7;
-      color: #ffffff;
-      border: none;
-      padding: 0.75rem;
-      border-radius: 6px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-top: 0.5rem;
-    }
-    .btn-submit:hover { background: #0369a1; }
+        .auth-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 440px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            position: relative;
+        }
 
-    .auth-toggle-link {
-      text-align: center;
-      margin-top: 1.25rem;
-      font-size: 0.85rem;
-      color: #64748b;
-    }
-    .auth-toggle-link a {
-      color: #0284c7;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .auth-toggle-link a:hover { text-decoration: underline; }
+        .brand-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
 
-    .status-msg {
-      font-size: 0.82rem;
-      text-align: center;
-      margin-top: 0.85rem;
-      font-weight: 600;
-      display: none;
-    }
-    .status-msg.error { color: #ef4444; }
-    .status-msg.info { color: #0284c7; }
-  </style>
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .brand-header h1 {
+            color: var(--text-main);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        /* Tabs */
+        .auth-tabs {
+            display: flex;
+            border-bottom: 2px solid #f1f5f9;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            color: var(--text-main);
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        /* Guest / Demo Button */
+        .btn-guest {
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-guest:hover {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .footer-note a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="auth-card">
-    <h2 id="cardTitle">Company Portal Login</h2>
+    <div class="auth-card">
+        <!-- Brand Header -->
+        <div class="brand-header">
+            <div class="brand-badge"><i class="fa-solid fa-chart-line"></i> Enterprise Portal</div>
+            <h1>Nonprofit Analytics</h1>
+        </div>
 
-    <!-- Navigation Tabs -->
-    <div class="tab-container">
-      <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">Sign In</button>
-      <button class="tab-btn" id="registerTab" onclick="switchTab('register')">Create Account</button>
+        <!-- Auth Tabs -->
+        <div class="auth-tabs">
+            <button class="tab-btn active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+            <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
+        </div>
+
+        <!-- Sign In Form -->
+        <form id="auth-form" onsubmit="handleFormSubmit(event)">
+            <div class="form-group">
+                <label for="email">Organization Email</label>
+                <div class="input-wrapper">
+                    <!-- Value attribute removed & placeholder added -->
+                    <input type="email" id="email" placeholder="name@organization.org" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <!-- Value attribute removed & placeholder added -->
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submit-btn">
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In
+            </button>
+        </form>
+
+        <!-- OR Divider -->
+        <div class="divider">
+            <span>Or Explore Sandbox</span>
+        </div>
+
+        <!-- Guest Sign In Button -->
+        <button type="button" class="btn btn-guest" onclick="signInAsGuest()">
+            <i class="fa-solid fa-user-shield"></i> Continue as Demo Guest
+        </button>
+
+        <div class="footer-note" id="footer-text">
+            Need an account? <a href="#" onclick="switchTab('register')">Register Organization</a>
+        </div>
     </div>
 
-    <!-- Login Form -->
-    <form id="loginForm" onsubmit="handleLogin(event)">
-      <div class="form-group">
-        <label for="loginEmail">Organization Email</label>
-        <input type="email" id="loginEmail" value="admin@marylandcentral.org" required>
-      </div>
-      <div class="form-group">
-        <label for="loginPassword">Password</label>
-        <input type="password" id="loginPassword" value="password123" required>
-      </div>
-      <button type="submit" class="btn-submit" id="loginBtn">Sign In</button>
-      <div class="auth-toggle-link">
-        Need an account? <a onclick="switchTab('register')">Register Organization</a>
-      </div>
-    </form>
+    <script>
+        let currentMode = 'signin';
 
-    <!-- Registration Form (Hidden by default) -->
-    <form id="registerForm" style="display: none;" onsubmit="handleRegister(event)">
-      <div class="form-group">
-        <label for="regOrgName">Organization Name</label>
-        <input type="text" id="regOrgName" placeholder="e.g., Maryland Central Hub" required>
-      </div>
-      <div class="form-group">
-        <label for="regEmail">Organization Email</label>
-        <input type="email" id="regEmail" placeholder="admin@org.org" required>
-      </div>
-      <div class="form-group">
-        <label for="regPassword">Create Password</label>
-        <input type="password" id="regPassword" placeholder="••••••••••••" required>
-      </div>
-      <button type="submit" class="btn-submit" id="regBtn">Create & Onboard Org</button>
-      <div class="auth-toggle-link">
-        Already registered? <a onclick="switchTab('login')">Sign In</a>
-      </div>
-    </form>
+        function switchTab(mode) {
+            currentMode = mode;
+            const tabSignIn = document.getElementById('tab-signin');
+            const tabRegister = document.getElementById('tab-register');
+            const submitBtn = document.getElementById('submit-btn');
+            const footerText = document.getElementById('footer-text');
 
-    <div class="status-msg" id="statusMsg"></div>
-  </div>
-
-  <script>
-    function switchTab(mode) {
-      const loginForm = document.getElementById('loginForm');
-      const registerForm = document.getElementById('registerForm');
-      const loginTab = document.getElementById('loginTab');
-      const registerTab = document.getElementById('registerTab');
-      const cardTitle = document.getElementById('cardTitle');
-      const statusMsg = document.getElementById('statusMsg');
-
-      statusMsg.style.display = 'none';
-
-      if (mode === 'login') {
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
-        loginTab.classList.add('active');
-        registerTab.classList.remove('active');
-        cardTitle.innerText = 'Company Portal Login';
-      } else {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-        registerTab.classList.add('active');
-        loginTab.classList.remove('active');
-        cardTitle.innerText = 'Register Organization';
-      }
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const statusMsg = document.getElementById('statusMsg');
-      const loginBtn = document.getElementById('loginBtn');
-
-      statusMsg.className = 'status-msg info';
-      statusMsg.innerText = 'Authenticating...';
-      statusMsg.style.display = 'block';
-
-      try {
-        const response = await fetch('api/login.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          if (result.status === 'success') {
-            localStorage.setItem('userOrg', JSON.stringify({
-              org_id: result.org_id || 'org_md_central',
-              org_name: result.org_name || 'Maryland Central Hub',
-              email: email
-            }));
-            window.location.href = 'index.html';
-            return;
-          }
+            if (mode === 'signin') {
+                tabSignIn.classList.add('active');
+                tabRegister.classList.remove('active');
+                submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+                footerText.innerHTML = 'Need an account? <a href="#" onclick="switchTab(\'register\')">Register Organization</a>';
+            } else {
+                tabRegister.classList.add('active');
+                tabSignIn.classList.remove('active');
+                submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register & Enter';
+                footerText.innerHTML = 'Already registered? <a href="#" onclick="switchTab(\'signin\')">Sign In</a>';
+            }
         }
-        throw new Error('Fallback trigger');
-      } catch (err) {
-        // Local Fallback Auth
-        statusMsg.innerText = '⚡ Server offline — logging in via Session Fallback Mode...';
-        setTimeout(() => {
-          localStorage.setItem('userOrg', JSON.stringify({
-            org_id: 'org_md_central',
-            org_name: 'Maryland Central Hub',
-            email: email
-          }));
-          window.location.href = 'index.html';
-        }, 800);
-      }
-    }
 
-    async function handleRegister(e) {
-      e.preventDefault();
-      const orgName = document.getElementById('regOrgName').value;
-      const email = document.getElementById('regEmail').value;
-      const password = document.getElementById('regPassword').value;
-      const statusMsg = document.getElementById('statusMsg');
+        function signInAsGuest() {
+            // Auto-fill seeded demo tenant credentials
+            document.getElementById('email').value = 'admin@marylandcentral.org';
+            document.getElementById('password').value = 'Password123!';
+            
+            // Set session storage flag for multi-tenant state
+            sessionStorage.setItem('org_id', 'org_default');
+            sessionStorage.setItem('user_role', 'guest_evaluator');
 
-      statusMsg.className = 'status-msg info';
-      statusMsg.innerText = 'Provisioning new tenant organization...';
-      statusMsg.style.display = 'block';
-
-      try {
-        const response = await fetch('api/register.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ org_name: orgName, email, password })
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          if (result.status === 'success') {
-            localStorage.setItem('userOrg', JSON.stringify({
-              org_id: result.org_id,
-              org_name: orgName,
-              email: email
-            }));
+            // Redirect straight to executive dashboard UI
             window.location.href = 'index.html';
-            return;
-          }
         }
-        throw new Error('Fallback trigger');
-      } catch (err) {
-        // Local Fallback Registration
-        statusMsg.innerText = `🎉 Welcome, ${orgName}! Provisioning tenant...`;
-        setTimeout(() => {
-          localStorage.setItem('userOrg', JSON.stringify({
-            org_id: 'org_' + Math.random().toString(36).substr(2, 6),
-            org_name: orgName,
-            email: email
-          }));
-          window.location.href = 'index.html';
-        }, 1000);
-      }
-    }
-  </script>
 
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            // Store session org context and route to dashboard
+            sessionStorage.setItem('org_id', 'org_default');
+            window.location.href = 'index.html';
+        }
+    </script>
 </body>
 </html>
