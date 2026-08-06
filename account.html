@@ -225,7 +225,7 @@
     <button class="close-btn" onclick="toggleSidebar()">&times;</button>
   </div>
   <ul class="sidebar-menu">
-    <li><a href="index.html">Dashboard</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
     <li><a href="insights.html">Executive Insights</a></li>
     <li><a href="data-pipeline.html">Data Warehouse Hub</a></li>
     <li><a href="about.html">Overview & Guide</a></li>
@@ -398,7 +398,7 @@
 
     function logout() {
       localStorage.removeItem('userOrg');
-      window.location.href = 'login.html';
+      window.location.href = 'index.html';
     }
 
     window.onload = loadAccountData;

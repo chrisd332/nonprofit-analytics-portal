@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nonprofit Executive Analytics Portal - Dashboard</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    /* Prevent side scrolling globally across the body */
+    html, body { 
+      background-color: #f8fafc; 
+      color: #1e293b; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      overflow-x: hidden; 
+      max-width: 100vw;
+    }
+
+    h1, h2, h3, .navbar h1, .page-title, .kpi-value {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 10;
+      width: 100%;
+    }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    
+    .hamburger-btn {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-size: 1.6rem;
+      padding: 0.2rem 0.4rem;
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .hamburger-btn:hover { color: #ffffff; transform: scale(1.1); }
+
+    .navbar h1 { 
+      font-size: 1.3rem; 
+      font-weight: 800; 
+      letter-spacing: 0.5px; 
+      background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+
+    .btn-logout {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.85rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-logout:hover { background: #dc2626; }
+
+    /* Sidebar Drawer */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -290px;
+      width: 290px;
+      height: 100vh;
+      background-color: #0f172a;
+      color: #fff;
+      z-index: 1000;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar.open { left: 0; }
+
+    .sidebar-header {
+      padding: 1.25rem 1.5rem;
+      background: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    .sidebar-header h3 { font-size: 1rem; color: #38bdf8; font-weight: 700; }
+    .close-btn { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; }
+    .close-btn:hover { color: #fff; }
+
+    .sidebar-menu { list-style: none; padding: 1rem 0; flex: 1; }
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1.5rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+    .sidebar-menu li a:hover, .sidebar-menu li a.active {
+      background: #1e293b;
+      color: #38bdf8;
+      border-left: 4px solid #38bdf8;
+    }
+    .menu-divider { height: 1px; background: #334155; margin: 0.75rem 0; }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+
+    /* Centered Dashboard Container */
+    .main-container { 
+      max-width: 1280px; 
+      margin: 1.5rem auto; 
+      padding: 0 1.5rem; 
+      width: 100%; 
+      flex: 1; 
+      box-sizing: border-box;
+    }
+
+    .page-header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem; }
+    .page-title { font-size: 1.6rem; font-weight: 700; color: #0f172a; }
+    .page-subtitle { font-size: 0.88rem; color: #64748b; margin-top: 0.2rem; }
+    .timestamp-badge {
+      font-size: 0.8rem;
+      color: #0284c7;
+      background: #e0f2fe;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(2, 132, 199, 0.15);
+    }
+    .timestamp-badge.offline { color: #b45309; background: #fef3c7; }
+
+    /* Filters */
+    .filter-card {
+      background: #ffffff;
+      padding: 1.25rem 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 1rem;
+      box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.08), 0 3px 6px -2px rgba(15, 23, 42, 0.04);
+    }
+    .filter-row { display: flex; gap: 1.25rem; align-items: flex-end; flex-wrap: wrap; }
+    .filter-group { display: flex; flex-direction: column; gap: 0.25rem; }
+    .filter-group label { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+    .filter-group select, .filter-group input { padding: 0.45rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; color: #1e293b; outline: none; }
+    .quick-picks { display: flex; gap: 0.4rem; align-items: center; }
+    .btn-quick { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 0.45rem 0.75rem; border-radius: 4px; font-size: 0.78rem; font-weight: 600; color: #475569; cursor: pointer; transition: all 0.2s; }
+    .btn-quick:hover, .btn-quick.active { background: #0284c7; color: #fff; border-color: #0284c7; }
+
+    .btn-export { margin-left: auto; background: #10b981; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); transition: all 0.2s; }
+    .btn-export:hover { background: #059669; transform: translateY(-1px); }
+
+    .active-pills-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .pill-label { font-size: 0.8rem; font-weight: 600; color: #64748b; }
+    .pill { background: #38bdf8; color: #0f172a; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 12px; display: flex; align-items: center; gap: 0.3rem; box-shadow: 0 2px 4px rgba(56, 189, 248, 0.2); }
+    .pill span { cursor: pointer; font-weight: 700; }
+    .btn-clear-all { font-size: 0.78rem; color: #ef4444; background: none; border: none; cursor: pointer; font-weight: 600; text-decoration: underline; }
+
+    /* KPI Cards */
+    .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.85rem; margin-bottom: 1.5rem; width: 100%; }
+    .kpi-card { background: #ffffff; padding: 1rem 0.6rem; border-radius: 10px; border: 1px solid #cbd5e1; text-align: center; position: relative; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 14px 20px -3px rgba(15, 23, 42, 0.12), 0 6px 8px -2px rgba(15, 23, 42, 0.06); }
+    .kpi-value { font-size: 1.45rem; font-weight: 700; color: #0f172a; white-space: nowrap; }
+    .kpi-label { font-size: 0.73rem; color: #64748b; font-weight: 600; margin-top: 0.25rem; line-height: 1.25; }
+    .kpi-trend { font-size: 0.68rem; font-weight: 700; margin-top: 0.4rem; display: inline-block; padding: 0.12rem 0.35rem; border-radius: 4px; white-space: nowrap; }
+    .trend-up { color: #166534; background: #dcfce7; }
+
+    /* Flexible Chart Grid Layout */
+    .charts-grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 1.5rem; 
+      margin-bottom: 1.5rem; 
+      width: 100%; 
+    }
+    .chart-card { 
+      background: #ffffff; 
+      padding: 1.5rem; 
+      border-radius: 10px; 
+      border: 1px solid #cbd5e1; 
+      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.09), 0 4px 6px -2px rgba(15, 23, 42, 0.04); 
+      transition: box-shadow 0.2s ease; 
+      display: flex; 
+      flex-direction: column; 
+      width: 100%; 
+      box-sizing: border-box;
+    }
+    .chart-card.full-width { grid-column: 1 / -1; }
+    .chart-card:hover { box-shadow: 0 14px 25px -5px rgba(15, 23, 42, 0.12), 0 6px 10px -2px rgba(15, 23, 42, 0.06); }
+    .chart-card h3 { font-size: 1.1rem; color: #0f172a; margin-bottom: 0.35rem; font-weight: 600; }
+    .chart-desc { font-size: 0.85rem; color: #475569; margin-bottom: 1.25rem; line-height: 1.5; }
+
+    /* Chart Container Wrappers for Perfect Scaling */
+    .chart-container-wrapper {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      max-width: 100%;
+    }
+
+    canvas {
+      max-width: 100% !important;
+      max-height: 100% !important;
+    }
+
+    /* Tables */
+    .tables-section { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; width: 100%; }
+    .table-card { background: #ffffff; padding: 1.5rem; border-radius: 10px; border: 1px solid #cbd5e1; box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.09), 0 4px 6px -2px rgba(15, 23, 42, 0.04); width: 100%; box-sizing: border-box; }
+    .table-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; gap: 1rem; }
+    .table-header-text { flex: 1; }
+    .table-header-text h3 { font-size: 1.1rem; font-weight: 600; color: #0f172a; margin-bottom: 0.35rem; }
+    .search-input { padding: 0.45rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; width: 240px; outline: none; }
+    .table-container { overflow-x: auto; width: 100%; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
+    th { background-color: #f1f5f9; color: #475569; font-weight: 600; padding: 0.75rem 1rem; border-bottom: 1px solid #cbd5e1; }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; color: #334155; }
+    code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.82rem; }
+
+    @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
+    @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 650px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .filter-row { flex-direction: column; align-items: stretch; }
+      .btn-export { margin-left: 0; width: 100%; justify-content: center; }
+      .table-header-row { flex-direction: column; align-items: stretch; }
+      .search-input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-left">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation Menu">☰</button>
+      <h1>Nonprofit Executive Analytics Portal</h1>
+    </div>
+    <div class="nav-right">
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- Slide-out Sidebar Drawer -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Navigation Menu</h3>
+      <button class="close-btn" onclick="toggleSidebar()">&times;</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="insights.html">Executive Insights</a></li>
+      <li><a href="data-pipeline.html">Data Warehouse Hub</a></li>
+      <li><a href="about.html">Overview & Guide</a></li>
+      <li><a href="account.html">My Account</a></li>
+      <li class="menu-divider"></li>
+      <li><a href="#" onclick="logout()" style="color: #ef4444;">Sign Out</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content Container -->
+  <main class="main-container">
+
+    <div class="page-header-row">
+      <div>
+        <h2 class="page-title">Executive Analytics Dashboard</h2>
+        <p class="page-subtitle">Real-time operational summary of financial contributions, volunteer capital, and aid impact.</p>
+      </div>
+      <div class="timestamp-badge" id="dbStatusBadge">
+        ⏳ Verifying Session...
+      </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="filter-card">
+      <div class="filter-row">
+        
+        <div class="filter-group">
+          <label for="donorType">Donor Type</label>
+          <select id="donorType" onchange="updateDashboard()">
+            <option value="All Donor Types">All Donor Types</option>
+            <option value="Corporate">Corporate</option>
+            <option value="Individual">Individual</option>
+            <option value="Grant / Foundation">Grant / Foundation</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="locationHub">Distribution Hub</label>
+          <select id="locationHub" onchange="updateDashboard()">
+            <option value="All Hub Locations">All Hub Locations</option>
+            <option value="East Region Hub">East Region Hub</option>
+            <option value="Maryland Central Hub">Maryland Central Hub</option>
+            <option value="Bowie Distribution Center">Bowie Distribution Center</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Date Presets</label>
+          <div class="quick-picks">
+            <button class="btn-quick" onclick="setPreset('This Month', this)">This Month</button>
+            <button class="btn-quick" onclick="setPreset('Last Quarter', this)">Last Quarter</button>
+            <button class="btn-quick active" onclick="setPreset('YTD', this)">YTD</button>
+            <button class="btn-quick" onclick="setPreset('All Time', this)">All Time</button>
+          </div>
+        </div>
+
+        <button class="btn-export" onclick="exportFilteredData()">
+          📥 Export CSV Data
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Active Filter Pills -->
+    <div class="active-pills-row" id="pillsRow">
+      <span class="pill-label">Active Filters:</span>
+      <div class="pill" id="pill-preset">Period: YTD <span onclick="resetPreset()">✕</span></div>
+      <button class="btn-clear-all" onclick="clearAllFilters()">Clear All Filters</button>
+    </div>
+
+    <!-- KPI Summary Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-donations">$0.00</div>
+        <div class="kpi-label">Total Monetary Donations</div>
+        <div class="kpi-trend trend-up">▲ +14% vs prior period</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-donors">0</div>
+        <div class="kpi-label">Active Donor Profiles</div>
+        <div class="kpi-trend trend-up">▲ +8% new acquisition</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-aid">0</div>
+        <div class="kpi-label">Aid Units Distributed</div>
+        <div class="kpi-trend trend-up">▲ +22% throughput</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" style="color: #0284c7;" id="kpi-beneficiaries">1,250</div>
+        <div class="kpi-label">Est. Beneficiaries Served</div>
+        <div class="kpi-trend trend-up">94% target fulfillment</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" style="color: #10b981;" id="kpi-volunteer-hrs">0 hrs</div>
+        <div class="kpi-label">Volunteer Labor Input</div>
+        <div class="kpi-trend trend-up" id="kpi-volunteer-val">~$0.0K labor value</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" style="color: #f59e0b;">$0.12</div>
+        <div class="kpi-label">Cost Per Dollar Raised</div>
+        <div class="kpi-trend trend-up">88% efficiency score</div>
+      </div>
+    </div>
+
+    <!-- Charts Grid (With Responsive Wrapping Containers) -->
+    <div class="charts-grid">
+      
+      <!-- 1. Full Width: Payment Method Breakdown -->
+      <div class="chart-card full-width">
+        <h3>Donation Performance by Payment Method</h3>
+        <p class="chart-desc">Monetary contributions aggregated across specific payment channels.</p>
+        <div class="chart-container-wrapper"><canvas id="donationChart"></canvas></div>
+      </div>
+
+      <!-- 2. HORIZONTAL PAIR: Donor Acquisition vs. Retention -->
+      <div class="chart-card">
+        <h3>Donor Acquisition vs. Retention Trend</h3>
+        <p class="chart-desc">Evaluates new donor acquisition metrics against recurring contribution retention over current operational cycles.</p>
+        <div class="chart-container-wrapper"><canvas id="retentionChart"></canvas></div>
+      </div>
+
+      <!-- 3. HORIZONTAL PAIR: Regional Distribution Efficiency Radar -->
+      <div class="chart-card">
+        <h3>Regional Distribution Efficiency Radar</h3>
+        <p class="chart-desc">Tracks fulfillment throughput, inventory turnover, and volunteer capacity scores across active distribution hubs.</p>
+        <div class="chart-container-wrapper"><canvas id="hubEfficiencyChart"></canvas></div>
+      </div>
+
+      <!-- 4. Full Width: Resource Aid Volume -->
+      <div class="chart-card full-width">
+        <h3>Resource Aid Volume by Distribution Hub</h3>
+        <p class="chart-desc">Volume of physical medical supplies and food/water rations distributed across facilities.</p>
+        <div class="chart-container-wrapper"><canvas id="resourceChart"></canvas></div>
+      </div>
+
+      <!-- 5. Full Width: Campaign Revenue vs Budget -->
+      <div class="chart-card full-width">
+        <h3>Campaign Revenue vs. Marketing Budget</h3>
+        <p class="chart-desc">Gross revenue generated against marketing expenditure for each major fundraising campaign.</p>
+        <div class="chart-container-wrapper"><canvas id="campaignChart"></canvas></div>
+      </div>
+
+    </div>
+
+    <!-- Data Tables Section -->
+    <div class="tables-section">
+      <div class="table-card">
+        <div class="table-header-row">
+          <div class="table-header-text">
+            <h3>Granular Financial Transaction Records</h3>
+            <p class="chart-desc" style="margin-bottom: 0;">Itemized line-by-line monetary gifts queried directly from fact_donations.</p>
+          </div>
+          <input type="text" id="tableSearch" class="search-input" placeholder="Search transactions..." onkeyup="filterTable()">
+        </div>
+        <div class="table-container">
+          <table id="recordsTable">
+            <thead>
+              <tr>
+                <th>Donor ID</th>
+                <th>Full Name / Entity</th>
+                <th>Type</th>
+                <th>Payment Method</th>
+                <th>Amount ($)</th>
+                <th>Transaction Date</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header-row">
+          <div class="table-header-text">
+            <h3>Volunteer Shift & Human Capital Activity Log</h3>
+            <p class="chart-desc" style="margin-bottom: 0;">Localized volunteer contributions evaluated using Independent Sector national standard ($31.80/hour).</p>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="volunteerTable">
+            <thead>
+              <tr>
+                <th>Log ID</th>
+                <th>Volunteer ID</th>
+                <th>Assigned Hub</th>
+                <th>Activity Category</th>
+                <th>Hours Contributed</th>
+                <th>Est. Economic Value ($)</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    Chart.register(ChartDataLabels);
+
+    let activePreset = 'YTD';
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+    }
+
+    const fallbackDonations = [
+      { id: 'dn_101', name: 'Chesapeake Bay Foundation', type: 'Grant / Foundation', method: 'Wire Transfer', amount: 25000, hub: 'East Region Hub', date: '2026-06-15' },
+      { id: 'dn_102', name: 'Apex Global Logistics', type: 'Corporate', method: 'Stripe', amount: 5000, hub: 'Maryland Central Hub', date: '2026-07-01' },
+      { id: 'dn_103', name: 'Jane Doe', type: 'Individual', method: 'PayPal', amount: 250, hub: 'Bowie Distribution Center', date: '2026-07-10' }
+    ];
+
+    const fallbackResources = [
+      { hub: 'East Region Hub', medical: 1500, food: 800 },
+      { hub: 'Maryland Central Hub', medical: 600, food: 500 },
+      { hub: 'Bowie Distribution Center', medical: 400, food: 200 }
+    ];
+
+    const fallbackVolunteers = [
+      { logId: 'vol_01', volId: 'v_55', hub: 'Maryland Central Hub', category: 'Food Packaging', hours: 40.0 },
+      { logId: 'vol_02', volId: 'v_58', hub: 'Bowie Distribution Center', category: 'Medical Logistics', hours: 25.5 }
+    ];
+
+    const fallbackCampaigns = [
+      { name: 'Spring Relief', revenue: 28000, budget: 3500 },
+      { name: 'Annual Gala', revenue: 15000, budget: 12000 },
+      { name: 'Digital Ads', revenue: 6200, budget: 1500 }
+    ];
+
+    let masterDonations = [];
+    let masterResources = [];
+    let masterVolunteers = [];
+    let masterCampaigns = [];
+
+    // Initialize 5 Chart.js Instances
+    const donationChart = new Chart(document.getElementById('donationChart').getContext('2d'), {
+      type: 'bar',
+      data: { labels: [], datasets: [{ label: 'Total Raised ($)', data: [], backgroundColor: ['#700080', '#0080ff', '#ff6600', '#0000aa', '#10b981'], barPercentage: 0.45 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'center', color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v) => (v >= 1000 ? '$' + (v / 1000).toFixed(1) + 'K' : '$' + v) } } }
+    });
+
+    const retentionChart = new Chart(document.getElementById('retentionChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ['Q1 2026', 'Q2 2026', 'Q3 2026', 'Q4 2026 (Est)'],
+        datasets: [
+          { label: 'New Donors', data: [120, 150, 180, 210], borderColor: '#0284c7', backgroundColor: 'rgba(2, 132, 199, 0.1)', fill: true, tension: 0.3 },
+          { label: 'Retained Donors', data: [450, 490, 530, 580], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    const resourceChart = new Chart(document.getElementById('resourceChart').getContext('2d'), {
+      type: 'bar',
+      data: { labels: [], datasets: [{ label: 'Medical', data: [], backgroundColor: '#0284c7' }, { label: 'Food', data: [], backgroundColor: '#10b981' }] },
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { position: 'bottom' }, datalabels: { anchor: 'center', color: '#fff', font: { weight: 'bold', size: 10 } } }, scales: { x: { stacked: true }, y: { stacked: true } } }
+    });
+
+    const hubEfficiencyChart = new Chart(document.getElementById('hubEfficiencyChart').getContext('2d'), {
+      type: 'radar',
+      data: {
+        labels: ['Fulfillment Speed', 'Inventory Turnover', 'Volunteer Capacity', 'Cost Efficiency', 'Beneficiary Reach'],
+        datasets: [{
+          label: 'Regional Hub Performance Score',
+          data: [85, 90, 78, 88, 92],
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56, 189, 248, 0.2)'
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    const campaignChart = new Chart(document.getElementById('campaignChart').getContext('2d'), {
+      type: 'bar',
+      data: { labels: [], datasets: [{ label: 'Revenue ($)', data: [], backgroundColor: '#10b981' }, { label: 'Budget ($)', data: [], backgroundColor: '#f59e0b' }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    async function loadLiveDashboardData() {
+      const badge = document.getElementById('dbStatusBadge');
+
+      try {
+        const response = await fetch('api/get_dashboard_data.php');
+        if (response.status === 401) { window.location.href = 'login.html'; return; }
+        if (!response.ok) throw new Error('API Request Failed');
+        
+        const dbData = await response.json();
+
+        if (dbData.status === 'success') {
+          masterDonations = (dbData.ledger || []).map(d => ({
+            id: d.donor_id,
+            name: d.full_name_or_entity,
+            type: d.donor_type,
+            method: d.payment_method,
+            amount: parseFloat(d.amount),
+            hub: 'Maryland Central Hub',
+            date: d.transaction_date
+          }));
+
+          masterResources = fallbackResources;
+          masterVolunteers = fallbackVolunteers;
+          masterCampaigns = fallbackCampaigns;
+          
+          const userOrg = JSON.parse(localStorage.getItem('userOrg'));
+          badge.innerText = `🏢 Tenant: ${userOrg ? userOrg.org_name : dbData.organization_id}`;
+          badge.classList.remove('offline');
+        } else {
+          throw new Error('Invalid JSON format');
+        }
+      } catch (err) {
+        masterDonations = fallbackDonations;
+        masterResources = fallbackResources;
+        masterVolunteers = fallbackVolunteers;
+        masterCampaigns = fallbackCampaigns;
+
+        badge.innerText = '⚡ Offline Mode (Fallback Data)';
+        badge.classList.add('offline');
+      }
+
+      campaignChart.data.labels = masterCampaigns.map(c => c.name);
+      campaignChart.data.datasets[0].data = masterCampaigns.map(c => c.revenue);
+      campaignChart.data.datasets[1].data = masterCampaigns.map(c => c.budget);
+      campaignChart.update();
+
+      updateDashboard();
+    }
+
+    function isDateInPreset(dateStr, preset) {
+      if (preset === 'All Time') return true;
+      const itemDate = new Date(dateStr);
+      const now = new Date('2026-07-28');
+      if (preset === 'This Month') return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+      if (preset === 'Last Quarter') return itemDate >= new Date('2026-04-01') && itemDate <= new Date('2026-06-30');
+      if (preset === 'YTD') return itemDate >= new Date('2026-01-01');
+      return true;
+    }
+
+    function updateDashboard() {
+      const selectedType = document.getElementById('donorType').value;
+      const selectedHub = document.getElementById('locationHub').value;
+
+      const filteredDonations = masterDonations.filter(item => {
+        const matchesType = (selectedType === 'All Donor Types') || (item.type === selectedType);
+        const matchesHub = (selectedHub === 'All Hub Locations') || (item.hub === selectedHub);
+        const matchesDate = isDateInPreset(item.date, activePreset);
+        return matchesType && matchesHub && matchesDate;
+      });
+
+      const filteredResources = masterResources.filter(item => (selectedHub === 'All Hub Locations') || (item.hub === selectedHub));
+      const filteredVolunteers = masterVolunteers.filter(item => (selectedHub === 'All Hub Locations') || (item.hub === selectedHub));
+
+      const totalAmount = filteredDonations.reduce((sum, d) => sum + d.amount, 0);
+      const activeDonors = new Set(filteredDonations.map(d => d.id)).size;
+      const totalAid = filteredResources.reduce((sum, r) => sum + r.medical + r.food, 0);
+      const totalVolHrs = filteredVolunteers.reduce((sum, v) => sum + v.hours, 0);
+      const volEconVal = totalVolHrs * 31.80;
+
+      // Persist state to localStorage for real-time narrative on Executive Insights page
+      const dashboardState = {
+        totalAmount,
+        activeDonors,
+        totalAid,
+        totalVolHrs,
+        volEconVal,
+        selectedType,
+        selectedHub,
+        activePreset
+      };
+      localStorage.setItem('dashboardState', JSON.stringify(dashboardState));
+
+      document.getElementById('kpi-donations').innerText = totalAmount >= 1000 ? `$${(totalAmount / 1000).toFixed(1)}K` : `$${totalAmount.toFixed(2)}`;
+      document.getElementById('kpi-donors').innerText = activeDonors;
+      document.getElementById('kpi-aid').innerText = totalAid.toLocaleString();
+      document.getElementById('kpi-volunteer-hrs').innerText = `${totalVolHrs.toFixed(1)} hrs`;
+      document.getElementById('kpi-volunteer-val').innerText = `~$${(volEconVal / 1000).toFixed(1)}K labor value`;
+
+      const paymentTotals = filteredDonations.reduce((acc, curr) => {
+        const method = curr.method || 'Other';
+        acc[method] = (acc[method] || 0) + curr.amount;
+        return acc;
+      }, {});
+
+      donationChart.data.labels = Object.keys(paymentTotals);
+      donationChart.data.datasets[0].data = Object.values(paymentTotals);
+      donationChart.update();
+
+      resourceChart.data.labels = filteredResources.map(r => r.hub.replace(' Hub', '').replace(' Center', ''));
+      resourceChart.data.datasets[0].data = filteredResources.map(r => r.medical);
+      resourceChart.data.datasets[1].data = filteredResources.map(r => r.food);
+      resourceChart.update();
+
+      updateTableUI(filteredDonations);
+      updateVolunteerTableUI(filteredVolunteers);
+      renderFilterPills(selectedType, selectedHub);
+    }
+
+    function setPreset(presetName, btnElement) {
+      activePreset = presetName;
+      document.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
+      btnElement.classList.add('active');
+      updateDashboard();
+    }
+
+    function resetPreset() {
+      activePreset = 'All Time';
+      document.querySelectorAll('.btn-quick').forEach(b => {
+        b.classList.remove('active');
+        if(b.innerText === 'All Time') b.classList.add('active');
+      });
+      updateDashboard();
+    }
+
+    function renderFilterPills(type, hub) {
+      const pillsContainer = document.getElementById('pillsRow');
+      let html = `<span class="pill-label">Active Filters:</span>`;
+      if (type !== 'All Donor Types') html += `<div class="pill">Type: ${type} <span onclick="resetFilter('donorType')">✕</span></div>`;
+      if (hub !== 'All Hub Locations') html += `<div class="pill">Hub: ${hub} <span onclick="resetFilter('locationHub')">✕</span></div>`;
+      if (activePreset !== 'All Time') html += `<div class="pill">Period: ${activePreset} <span onclick="resetPreset()">✕</span></div>`;
+      html += `<button class="btn-clear-all" onclick="clearAllFilters()">Clear All Filters</button>`;
+      pillsContainer.innerHTML = html;
+    }
+
+    function resetFilter(id) {
+      document.getElementById(id).value = id === 'donorType' ? 'All Donor Types' : 'All Hub Locations';
+      updateDashboard();
+    }
+
+    function clearAllFilters() {
+      document.getElementById('donorType').value = 'All Donor Types';
+      document.getElementById('locationHub').value = 'All Hub Locations';
+      activePreset = 'All Time';
+      document.querySelectorAll('.btn-quick').forEach(b => {
+        b.classList.remove('active');
+        if(b.innerText === 'All Time') b.classList.add('active');
+      });
+      updateDashboard();
+    }
+
+    function updateTableUI(data) {
+      const tbody = document.querySelector('#recordsTable tbody');
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:1.5rem;">No database records found for the selected filters.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.map(d => `
+        <tr>
+          <td><code>${d.id}</code></td>
+          <td>${d.name}</td>
+          <td>${d.type}</td>
+          <td>${d.method}</td>
+          <td><strong>$${d.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></td>
+          <td>${d.date}</td>
+        </tr>
+      `).join('');
+    }
+
+    function updateVolunteerTableUI(data) {
+      const tbody = document.querySelector('#volunteerTable tbody');
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:1.5rem;">No volunteer records found for the selected hub.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.map(v => `
+        <tr>
+          <td><code>${v.logId}</code></td>
+          <td><code>${v.volId}</code></td>
+          <td>${v.hub}</td>
+          <td>${v.category}</td>
+          <td><strong>${v.hours.toFixed(1)} hrs</strong></td>
+          <td>$${(v.hours * 31.80).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+        </tr>
+      `).join('');
+    }
+
+    function filterTable() {
+      const input = document.getElementById('tableSearch').value.toLowerCase();
+      const rows = document.querySelectorAll('#recordsTable tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+      });
+    }
+
+    function exportFilteredData() {
+      const selectedType = document.getElementById('donorType').value;
+      const selectedHub = document.getElementById('locationHub').value;
+
+      const filteredDonations = masterDonations.filter(item => {
+        const matchesType = (selectedType === 'All Donor Types') || (item.type === selectedType);
+        const matchesHub = (selectedHub === 'All Hub Locations') || (item.hub === selectedHub);
+        const matchesDate = isDateInPreset(item.date, activePreset);
+        return matchesType && matchesHub && matchesDate;
+      });
+
+      const rows = [["donor_id", "full_name", "donor_type", "payment_method", "amount", "transaction_date"]];
+      filteredDonations.forEach(d => rows.push([d.id, d.name, d.type, d.method, d.amount.toFixed(2), d.date]));
+
+      let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `nonprofit_${activePreset.toLowerCase().replace(' ','_')}_export.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function logout() {
+      localStorage.removeItem('userOrg');
+      window.location.href = 'index.html';
+    }
+
+    window.onload = function() {
+      loadLiveDashboardData();
+    };
+  </script>
+
+</body>
+</html>
