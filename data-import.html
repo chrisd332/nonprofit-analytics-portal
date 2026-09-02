@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nonprofit Executive Analytics Portal - Data Import Center</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- CSV Parser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+    
+    body { 
+      background-color: #f8fafc; 
+      color: #1e293b; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+    }
+
+    h1, h2, h3, .navbar h1, .page-title, .card-title {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* Top Navigation Header */
+    .navbar {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 10;
+    }
+    
+    .nav-left { 
+      display: flex; 
+      align-items: center; 
+      gap: 1rem; 
+    }
+    
+    .hamburger-btn {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-size: 1.6rem;
+      padding: 0.2rem 0.4rem;
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .hamburger-btn:hover { 
+      color: #ffffff; 
+      transform: scale(1.1); 
+    }
+
+    .navbar h1 { 
+      font-size: 1.3rem; 
+      font-weight: 800; 
+      letter-spacing: 0.5px; 
+      background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .nav-right { 
+      display: flex; 
+      align-items: center; 
+      gap: 1rem; 
+    }
+
+    .btn-logout {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.85rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-logout:hover { 
+      background: #dc2626; 
+    }
+
+    /* Slide-out Sidebar Drawer */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -290px;
+      width: 290px;
+      height: 100vh;
+      background-color: #0f172a;
+      color: #fff;
+      z-index: 1000;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar.open { 
+      left: 0; 
+    }
+
+    .sidebar-header {
+      padding: 1.25rem 1.5rem;
+      background: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    .sidebar-header h3 { 
+      font-size: 1rem; 
+      color: #38bdf8; 
+      font-weight: 700; 
+    }
+    .close-btn { 
+      background: none; 
+      border: none; 
+      color: #94a3b8; 
+      font-size: 1.5rem; 
+      cursor: pointer; 
+    }
+    .close-btn:hover { 
+      color: #fff; 
+    }
+
+    .sidebar-menu { 
+      list-style: none; 
+      padding: 1rem 0; 
+      flex: 1; 
+    }
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1.5rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+    .sidebar-menu li a:hover, .sidebar-menu li a.active {
+      background: #1e293b;
+      color: #38bdf8;
+      border-left: 4px solid #38bdf8;
+    }
+    .menu-divider { 
+      height: 1px; 
+      background: #334155; 
+      margin: 0.75rem 0; 
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.active { 
+      opacity: 1; 
+      pointer-events: auto; 
+    }
+
+    /* Main Container & Page Layout */
+    .main-container { 
+      max-width: 1100px; 
+      margin: 2rem auto; 
+      padding: 0 1.5rem; 
+      width: 100%; 
+      flex: 1; 
+    }
+
+    .page-header-row { 
+      margin-bottom: 1.5rem; 
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .page-title { 
+      font-size: 1.6rem; 
+      font-weight: 700; 
+      color: #0f172a; 
+    }
+    .page-subtitle { 
+      font-size: 0.88rem; 
+      color: #64748b; 
+      margin-top: 0.2rem; 
+    }
+
+    /* Content Cards */
+    .import-card {
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+    }
+    .card-title {
+      font-size: 1.25rem;
+      color: #0f172a;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-subtitle {
+      color: #64748b;
+      font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .grid-2col { grid-template-columns: 1fr; }
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      margin-bottom: 0.4rem;
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.92rem;
+      color: #1e293b;
+      background-color: #ffffff;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    /* Drop Zone */
+    .drop-zone {
+      border: 2px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      background-color: #f8fafc;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: #0284c7;
+      background-color: #f0f9ff;
+    }
+    .drop-zone i {
+      font-size: 2.4rem;
+      color: #0284c7;
+      margin-bottom: 0.75rem;
+    }
+    .drop-zone h4 {
+      font-size: 1rem;
+      color: #0f172a;
+      margin-bottom: 0.25rem;
+      font-weight: 700;
+    }
+    .drop-zone p {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+    #file-input { display: none; }
+
+    /* Action Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1.1rem;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.15s ease;
+    }
+    .btn-primary {
+      background-color: #0284c7;
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background-color: #0369a1;
+    }
+    .btn-success {
+      background-color: #10b981;
+      color: #ffffff;
+    }
+    .btn-success:hover {
+      background-color: #059669;
+    }
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+    }
+    .btn-secondary:hover {
+      background-color: #f1f5f9;
+    }
+
+    /* Tables */
+    .table-responsive {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    th {
+      background-color: #f8fafc;
+      color: #64748b;
+      font-weight: 700;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #cbd5e1;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.03em;
+    }
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      color: #1e293b;
+    }
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    /* Badges */
+    .stat-badge {
+      background: #f1f5f9;
+      border-left: 4px solid #38bdf8;
+      padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+      border-radius: 4px;
+      font-size: 0.88rem;
+      color: #475569;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-success { background-color: #dcfce7; color: #15803d; }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1050;
+    }
+    .modal {
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      width: 100%;
+      max-width: 500px;
+      padding: 1.75rem;
+      box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.2);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+    .close-modal:hover { color: #0f172a; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-left">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation Menu">☰</button>
+      <h1>Nonprofit Executive Analytics Portal</h1>
+    </div>
+    <div class="nav-right">
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- Slide-out Sidebar Menu -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Navigation Menu</h3>
+      <button class="close-btn" onclick="toggleSidebar()">&times;</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="data-import.html" class="active">Data Import Center</a></li>
+      <li><a href="insights.html">Executive Insights</a></li>
+      <li><a href="data-pipeline.html">Data Warehouse Hub</a></li>
+      <li><a href="about.html">Overview & Guide</a></li>
+      <li><a href="account.html">My Account</a></li>
+      <li class="menu-divider"></li>
+      <li><a href="#" onclick="logout()" style="color: #ef4444;">Sign Out</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <div class="page-header-row">
+      <div>
+        <h2 class="page-title">Data Import & Pipeline Hub</h2>
+        <p class="page-subtitle">Batch import CSV record sets or execute ad-hoc entries directly into operational entities.</p>
+      </div>
+      <button class="btn btn-success" onclick="openModal()"><i class="fa-solid fa-plus"></i> Manual Single Entry</button>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="grid-2col">
+      <div class="import-card">
+        <h3 class="card-title"><i class="fa-solid fa-file-arrow-up" style="color: #0284c7;"></i> Batch File Ingestion</h3>
+        <p class="card-subtitle">Upload raw CSV records from CRM gateways or volunteer tracking sheets.</p>
+        
+        <div class="form-group">
+          <label for="target-entity">Target Database Schema</label>
+          <select id="target-entity" class="form-control">
+            <option value="fact_donations">fact_donations (Financial Contributions)</option>
+            <option value="fact_volunteer_activity">fact_volunteer_activity (Volunteer Hours Log)</option>
+            <option value="dim_donors">dim_donors (Donor Profiles)</option>
+          </select>
+        </div>
+
+        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <h4>Click or Drag & Drop CSV dataset here</h4>
+          <p>Supports standard exported CSV files up to 10MB</p>
+          <input type="file" id="file-input" accept=".csv">
+        </div>
+      </div>
+
+      <div class="import-card">
+        <h3 class="card-title"><i class="fa-solid fa-list-check" style="color: #0284c7;"></i> Formatting Guide</h3>
+        <p class="card-subtitle">Follow these guidelines for smooth data warehouse staging:</p>
+        <ul style="color: #475569; font-size: 0.88rem; padding-left: 1.2rem; line-height: 1.7;">
+          <li>Header row required in first line of CSV file.</li>
+          <li>Dates formatted as <code>YYYY-MM-DD</code>.</li>
+          <li>Numeric currency amounts without symbols (e.g., <code>150.00</code>).</li>
+          <li>Check for duplicate primary IDs before uploading.</li>
+        </ul>
+        <div class="stat-badge">
+          ℹ️ Schema Engine: Validates types automatically
+        </div>
+      </div>
+    </div>
+
+    <!-- Parsed File Preview Section -->
+    <div class="import-card" id="preview-card" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h3 class="card-title"><i class="fa-solid fa-table" style="color: #0284c7;"></i> Parsed File Preview & Staging</h3>
+          <p class="card-subtitle" id="file-info-text" style="margin-bottom: 0;">Review row structure before executing warehouse load.</p>
+        </div>
+        <button class="btn btn-primary" onclick="commitData()"><i class="fa-solid fa-database"></i> Commit to Warehouse</button>
+      </div>
+      <div class="table-responsive">
+        <table id="preview-table">
+          <thead><tr id="preview-thead"></tr></thead>
+          <tbody id="preview-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Import Audit Trail -->
+    <div class="import-card">
+      <h3 class="card-title"><i class="fa-solid fa-clock-rotate-left" style="color: #0284c7;"></i> Recent Ingestion History</h3>
+      <p class="card-subtitle">Audit trail of recent data pipeline load batches.</p>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Batch ID</th>
+              <th>Target Table</th>
+              <th>Source File</th>
+              <th>Rows Processed</th>
+              <th>Ingestion Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="log-tbody">
+            <tr>
+              <td><code>#BATCH-9104</code></td>
+              <td>fact_donations</td>
+              <td><code>stripe_donations_aug.csv</code></td>
+              <td>1,240</td>
+              <td>2026-08-05 14:22</td>
+              <td><span class="badge badge-success"><i class="fa-solid fa-check"></i> Success</span></td>
+            </tr>
+            <tr>
+              <td><code>#BATCH-9082</code></td>
+              <td>fact_volunteer_activity</td>
+              <td><code>bowie_volunteers_q2.csv</code></td>
+              <td>310</td>
+              <td>2026-08-01 09:15</td>
+              <td><span class="badge badge-success"><i class="fa-solid fa-check"></i> Success</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Manual Entry Modal -->
+  <div class="modal-overlay" id="entry-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Ad-Hoc Transaction Entry</h3>
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+      </div>
+      <form onsubmit="handleManualSubmit(event)">
+        <div class="form-group">
+          <label>Donor / Organization Name</label>
+          <input type="text" class="form-control" placeholder="e.g., John Doe or Acme Corp" required>
+        </div>
+        <div class="form-group">
+          <label>Donor Category</label>
+          <select class="form-control">
+            <option>Individual</option>
+            <option>Corporate</option>
+            <option>Grant / Foundation</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount ($)</label>
+          <input type="number" step="0.01" class="form-control" placeholder="0.00" required>
+        </div>
+        <div class="form-group">
+          <label>Payment Channel</label>
+          <select class="form-control">
+            <option>Credit Card</option>
+            <option>ACH Direct Deposit</option>
+            <option>Check</option>
+            <option>Cash</option>
+          </select>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  // Navigation Drawer
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+  }
+
+  function logout() {
+    localStorage.removeItem('userOrg');
+    window.location.href = 'index.html';
+  }
+
+  // Load persistent Ingestion History on page load
+  window.onload = function() {
+    renderIngestionLogs();
+  };
+
+  function renderIngestionLogs() {
+    const logTbody = document.getElementById('log-tbody');
+    const logs = JSON.parse(localStorage.getItem('portal_ingestion_logs') || '[]');
+    
+    if (logs.length === 0) {
+      logTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b;">No batches imported yet.</td></tr>`;
+      return;
+    }
+
+    logTbody.innerHTML = logs.map(log => `
+      <tr>
+        <td><code>${log.batchId}</code></td>
+        <td>${log.targetTable}</td>
+        <td><code>${log.fileName}</code></td>
+        <td>${Number(log.rowsCount).toLocaleString()}</td>
+        <td>${log.timestamp}</td>
+        <td><span class="badge badge-success"><i class="fa-solid fa-check"></i> Success</span></td>
+      </tr>
+    `).join('');
+  }
+
+  // CSV Drag and Drop & Parsing
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  let currentFile = null;
+  let parsedRows = [];
+
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length) handleFile(e.target.files[0]);
+  });
+
+  function handleFile(file) {
+    if (!file.name.endsWith('.csv')) {
+      alert('Please upload a valid .csv file.');
+      return;
+    }
+    currentFile = file;
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        parsedRows = results.data;
+        renderPreview(file.name, results.meta.fields, results.data);
+      }
+    });
+  }
+
+  function renderPreview(fileName, headers, rows) {
+    document.getElementById('preview-card').style.display = 'block';
+    document.getElementById('file-info-text').innerText = `File: ${fileName} | Parsed ${rows.length} rows ready for staging.`;
+
+    const thead = document.getElementById('preview-thead');
+    const tbody = document.getElementById('preview-tbody');
+    thead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+    tbody.innerHTML = rows.slice(0, 5).map(row => `
+      <tr>${headers.map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>
+    `).join('');
+  }
+
+  // Commit Data to LocalStorage
+  function commitData() {
+    const targetTable = document.getElementById('target-entity').value;
+    if (!parsedRows || parsedRows.length === 0) {
+      alert('Please select and parse a CSV file first.');
+      return;
+    }
+
+    // 1. Normalize and Save Data Records
+    const existingData = JSON.parse(localStorage.getItem(targetTable) || '[]');
+    const combinedData = existingData.concat(parsedRows);
+    localStorage.setItem(targetTable, JSON.stringify(combinedData));
+
+    // 2. Persist Ingestion Log
+    const newLog = {
+      batchId: '#BATCH-' + Math.floor(1000 + Math.random() * 9000),
+      targetTable: targetTable,
+      fileName: currentFile ? currentFile.name : 'manual_upload.csv',
+      rowsCount: parsedRows.length,
+      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
+    };
+
+    const existingLogs = JSON.parse(localStorage.getItem('portal_ingestion_logs') || '[]');
+    existingLogs.unshift(newLog);
+    localStorage.setItem('portal_ingestion_logs', JSON.stringify(existingLogs));
+
+    // 3. Refresh UI Table & Feedback
+    renderIngestionLogs();
+    document.getElementById('preview-card').style.display = 'none';
+    alert(`Success! Loaded ${parsedRows.length} records into '${targetTable}'. The Dashboard will now reflect these numbers.`);
+  }
+
+  // Quick Modal Entry
+  function openModal() { document.getElementById('entry-modal').style.display = 'flex'; }
+  function closeModal() { document.getElementById('entry-modal').style.display = 'none'; }
+  function handleManualSubmit(e) {
+    e.preventDefault();
+    parsedRows = [{
+      donor_id: 'D-' + Math.floor(1000 + Math.random() * 9000),
+      donor_name: e.target[0].value,
+      donor_type: e.target[1].value,
+      amount: parseFloat(e.target[2].value),
+      payment_method: e.target[3].value,
+      transaction_date: new Date().toISOString().substring(0, 10),
+      hub_location: 'East Region Hub'
+    }];
+    commitData();
+    closeModal();
+  }
+</script>
+</body>
+</html>

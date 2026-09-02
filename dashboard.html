@@ -289,6 +289,7 @@
     </div>
     <ul class="sidebar-menu">
       <li><a href="dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="data-import.html">Data Import Center</a></li>
       <li><a href="insights.html">Executive Insights</a></li>
       <li><a href="data-pipeline.html">Data Warehouse Hub</a></li>
       <li><a href="about.html">Overview & Guide</a></li>
@@ -576,6 +577,10 @@
     async function loadLiveDashboardData() {
       const badge = document.getElementById('dbStatusBadge');
 
+      // 1. Check for locally imported CSV data first
+      const storedDonations = localStorage.getItem('fact_donations');
+      const storedVolunteers = localStorage.getItem('fact_volunteer_activity');
+
       try {
         const response = await fetch('api/get_dashboard_data.php');
         if (response.status === 401) { window.location.href = 'login.html'; return; }
@@ -605,13 +610,52 @@
           throw new Error('Invalid JSON format');
         }
       } catch (err) {
-        masterDonations = fallbackDonations;
-        masterResources = fallbackResources;
-        masterVolunteers = fallbackVolunteers;
-        masterCampaigns = fallbackCampaigns;
+        // 2. OFFLINE MODE: If user has imported CSVs via data-import.html, load them!
+        if (storedDonations || storedVolunteers) {
+          badge.innerText = '📁 Local CSV Dataset Active';
+          badge.classList.remove('offline');
 
-        badge.innerText = '⚡ Offline Mode (Fallback Data)';
-        badge.classList.add('offline');
+          if (storedDonations) {
+            const rawDonations = JSON.parse(storedDonations);
+            masterDonations = rawDonations.map((d, i) => ({
+              id: d.donation_id || d.donor_id || `dn_${i + 1}`,
+              name: d.donor_name || d.full_name || 'Anonymous Donor',
+              type: d.donor_tier || d.donor_type || 'Individual',
+              method: d.payment_method || 'Credit Card',
+              amount: parseFloat(d.amount) || 0,
+              hub: d.hub_name || d.hub_location || 'East Region Hub',
+              date: d.donation_date || d.transaction_date || '2026-08-01'
+            }));
+          } else {
+            masterDonations = fallbackDonations;
+          }
+
+          if (storedVolunteers) {
+            const rawVolunteers = JSON.parse(storedVolunteers);
+            masterVolunteers = rawVolunteers.map((v, i) => ({
+              logId: v.activity_id || `vol_${i + 1}`,
+              volId: v.volunteer_id || `v_${i + 1}`,
+              hub: v.hub_name || v.hub_id || 'Maryland Central Hub',
+              category: 'Field Operations',
+              hours: parseFloat(v.volunteer_hours) || 0
+            }));
+          } else {
+            masterVolunteers = fallbackVolunteers;
+          }
+
+          masterResources = fallbackResources;
+          masterCampaigns = fallbackCampaigns;
+
+        } else {
+          // 3. True default fallback if nothing has ever been imported
+          masterDonations = fallbackDonations;
+          masterResources = fallbackResources;
+          masterVolunteers = fallbackVolunteers;
+          masterCampaigns = fallbackCampaigns;
+
+          badge.innerText = '⚡ Offline Mode (Fallback Data)';
+          badge.classList.add('offline');
+        }
       }
 
       campaignChart.data.labels = masterCampaigns.map(c => c.name);
